@@ -27,6 +27,7 @@ public class ApiViewModel extends AndroidViewModel {
         return mResponseLiveData;
     }
 
+
     public void makeApiCall(ApiCallback callback) {
         new Handler().postDelayed(() -> {
             ApiResponse response = new ApiResponse();
