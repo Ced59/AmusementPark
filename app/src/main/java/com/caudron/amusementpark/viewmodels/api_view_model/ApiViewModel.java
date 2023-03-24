@@ -20,6 +20,7 @@ public class ApiViewModel extends AndroidViewModel {
         super(application);
     }
 
+
     public LiveData<ApiResponse> getResponseLiveData() {
         if (mResponseLiveData == null) {
             mResponseLiveData = new MutableLiveData<>();
