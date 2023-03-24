@@ -28,9 +28,7 @@ public class ApiViewModel extends AndroidViewModel {
     }
 
     public void makeApiCall(ApiCallback callback) {
-        // Simulate API call
         new Handler().postDelayed(() -> {
-            // Simulate API success response
             ApiResponse response = new ApiResponse();
             response.setData(new ArrayList<>());
             callback.onSuccess(response);
