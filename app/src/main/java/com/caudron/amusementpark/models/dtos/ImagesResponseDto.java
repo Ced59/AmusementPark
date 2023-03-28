@@ -5,14 +5,38 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 public class ImagesResponseDto {
-    @SerializedName("hydra:member")
-    private List<ImageDto> images;
 
-    public List<ImageDto> getImages() {
-        return images;
+
+    @SerializedName("hydra:member")
+    private List<ImageDto> imageDtos;
+
+    @SerializedName("hydra:totalItems")
+    private int totalItems;
+
+    @SerializedName("hydra:view")
+    private ViewDto viewDto;
+
+    public List<ImageDto> getImageDtos() {
+        return imageDtos;
     }
 
-    public void setImages(List<ImageDto> images) {
-        this.images = images;
+    public void setImageDtos(List<ImageDto> imageDtos) {
+        this.imageDtos = imageDtos;
+    }
+
+    public int getTotalItems() {
+        return totalItems;
+    }
+
+    public void setTotalItems(int totalItems) {
+        this.totalItems = totalItems;
+    }
+
+    public ViewDto getViewDto() {
+        return viewDto;
+    }
+
+    public void setViewDto(ViewDto viewDto) {
+        this.viewDto = viewDto;
     }
 }

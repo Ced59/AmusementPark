@@ -1,6 +1,7 @@
 package com.caudron.amusementpark.views.splashscreen;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -23,6 +24,8 @@ import com.caudron.amusementpark.views.MainActivity;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import kotlin.jvm.functions.Function2;
+
 public class SplashScreenActivity extends AppCompatActivity {
 
     private ProgressBar mLoaderIcon;
@@ -30,6 +33,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     private TextView mBackgroundTaskInfoProgress;
 
     private int coasterNbPages = 0;
+    private int imagesNbPages = 0;
 
     private ApiViewModel mApiViewModel;
     private DatabaseViewModel mDatabaseViewModel;
@@ -53,43 +57,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         loadCoasters();
     }
 
-    private void loadCoastersRecursive(final int currentPage, int nbPages) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mBackgroundTaskInfoProgress.setText("Chargement de la page n° " + currentPage + " sur " + nbPages);
-            }
-        });
-        mApiViewModel.getCoasters(mAuthToken, currentPage).observe(this, new Observer<CoastersResponseDto>() {
-            @Override
-            public void onChanged(CoastersResponseDto coasters) {
-                if (coasters != null && coasters.getCoasterDtos() != null) {
-                    // Insert coasters into database
-                    //mDatabaseViewModel.insertCoasters(coasters);
-
-                    Pattern pattern = Pattern.compile("page=(\\d+)");
-                    Matcher matcher = pattern.matcher(coasters.getViewDto().getLastPage());
-                    if (matcher.find()){
-                        String numberStr = matcher.group(1);
-                        coasterNbPages = Integer.parseInt(numberStr);
-                    }
-                    else {
-                        showErrorToast();
-                    }
-
-                    if (currentPage < coasterNbPages) {
-                        // Load next page recursively
-                        loadCoastersRecursive(currentPage + 1, coasterNbPages);
-                    } else {
-                        // This is the last page, so load image URLs now
-                        loadImageUrls();
-                    }
-                } else {
-                    showErrorToast();
-                }
-            }
-        });
-    }
 
     private void loadCoasters() {
         mBackgroundTaskInfoType.setText("Chargement des coasters...");
@@ -97,20 +64,8 @@ public class SplashScreenActivity extends AppCompatActivity {
             @Override
             public void onChanged(CoastersResponseDto coasters) {
                 if (coasters != null && coasters.getCoasterDtos() != null) {
-
-
-                    Pattern pattern = Pattern.compile("page=(\\d+)");
-                    Matcher matcher = pattern.matcher(coasters.getViewDto().getLastPage());
-                    if (matcher.find()){
-                        String numberStr = matcher.group(1);
-                        coasterNbPages = Integer.parseInt(numberStr);
-                    }
-                    else {
-                        showErrorToast();
-                    }
-
-
-                    loadCoastersRecursive(1, coasterNbPages); // Start loading pages recursively
+                    int nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
+                    loadDataRecursive(1, nbPages, mApiViewModel::getCoasters, mAuthToken);
                 } else {
                     showErrorToast();
                 }
@@ -119,13 +74,13 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void loadImageUrls() {
-        mApiViewModel.getImageUrls(mAuthToken).observe(this, new Observer<ImagesResponseDto>() {
+        mBackgroundTaskInfoType.setText("Chargement des images...");
+        mApiViewModel.getImageUrls(mAuthToken, 1).observe(this, new Observer<ImagesResponseDto>() {
             @Override
             public void onChanged(ImagesResponseDto images) {
-                if (images != null && images.getImages() != null) {
-                    // Insert image URLs into database
-                    //mDatabaseViewModel.insertImages(images);
-                    loadParks();
+                if (images != null && images.getImageDtos() != null) {
+                    int nbPages = extractPageNumber(images.getViewDto().getLastPage());
+                    loadDataRecursive(1, nbPages, mApiViewModel::getImageUrls, mAuthToken);
                 } else {
                     showErrorToast();
                 }
@@ -133,14 +88,15 @@ public class SplashScreenActivity extends AppCompatActivity {
         });
     }
 
+
     private void loadParks() {
-        mApiViewModel.getParks(mAuthToken).observe(this, new Observer<ParksResponseDto>() {
+        mBackgroundTaskInfoType.setText("Chargement des parcs...");
+        mApiViewModel.getParks(mAuthToken, 1).observe(this, new Observer<ParksResponseDto>() {
             @Override
             public void onChanged(ParksResponseDto parks) {
                 if (parks != null && parks.getParks() != null) {
-                    // Insert parks into database
-                    //mDatabaseViewModel.insertParks(parks);
-                    loadStatuses();
+                    int nbPages = extractPageNumber(parks.getViewDto().getLastPage());
+                    loadDataRecursive(1, nbPages, mApiViewModel::getParks, mAuthToken);
                 } else {
                     showErrorToast();
                 }
@@ -149,19 +105,70 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void loadStatuses() {
-        mApiViewModel.getStatuses(mAuthToken).observe(this, new Observer<StatusesResponseDto>() {
+        mBackgroundTaskInfoType.setText("Chargement des statuts...");
+        mApiViewModel.getStatuses(mAuthToken, 1).observe(this, new Observer<StatusesResponseDto>() {
             @Override
             public void onChanged(StatusesResponseDto statuses) {
                 if (statuses != null && statuses.getStatuses() != null) {
-                    // Insert statuses into database
-                    //mDatabaseViewModel.insertStatuses(statuses);
-                    launchMainActivity();
+                    int nbPages = extractPageNumber(statuses.getViewDto().getLastPage());
+                    loadDataRecursive(1, nbPages, mApiViewModel::getStatuses, mAuthToken);
                 } else {
                     showErrorToast();
                 }
             }
         });
     }
+
+
+    private <T> void loadDataRecursive(final int currentPage, int nbPages, Function2<String, Integer, LiveData<T>> apiCall, String authToken) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mBackgroundTaskInfoProgress.setText("Chargement de la page n° " + currentPage + " sur " + nbPages);
+            }
+        });
+        apiCall.invoke(authToken, currentPage).observe(this, new Observer<T>() {
+            @Override
+            public void onChanged(T data) {
+                if (data != null) {
+                    int nbPages = 0;
+                    if (data instanceof CoastersResponseDto) {
+                        CoastersResponseDto coasters = (CoastersResponseDto) data;
+                        nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
+                        // Insert coasters into database
+                        //mDatabaseViewModel.insertCoasters(coasters);
+                    } else if (data instanceof ImagesResponseDto) {
+                        ImagesResponseDto images = (ImagesResponseDto) data;
+                        nbPages = extractPageNumber(images.getViewDto().getLastPage());
+                        // Insert images into database
+                        //mDatabaseViewModel.insertImages(images);
+                    } else if (data instanceof  ParksResponseDto){
+                        ParksResponseDto parks = (ParksResponseDto) data;
+                        nbPages = extractPageNumber(parks.getViewDto().getLastPage());
+                    }
+
+                    if (currentPage < nbPages) {
+                        // Load next page recursively
+                        loadDataRecursive(currentPage + 1, nbPages, apiCall, authToken);
+                    } else {
+                        if (data instanceof CoastersResponseDto){
+                            loadImageUrls();
+                        } else if (data instanceof ImagesResponseDto) {
+                            loadParks();
+                        } else if (data instanceof  ParksResponseDto){
+                            loadStatuses();
+                        } else {
+                            launchMainActivity();
+                        }
+                    }
+                } else {
+                    showErrorToast();
+                }
+            }
+        });
+    }
+
+
 
     private void launchMainActivity() {
         Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
@@ -171,5 +178,16 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private void showErrorToast() {
         Toast.makeText(SplashScreenActivity.this, "Une erreur s'est produite lors du chargement des données.", Toast.LENGTH_LONG).show();
+    }
+
+    private int extractPageNumber(String lastPage) {
+        Pattern pattern = Pattern.compile("page=(\\d+)");
+        Matcher matcher = pattern.matcher(lastPage);
+        if (matcher.find()){
+            String numberStr = matcher.group(1);
+            return Integer.parseInt(numberStr);
+        } else {
+            return 0;
+        }
     }
 }

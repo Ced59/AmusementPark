@@ -55,10 +55,10 @@ public class ApiViewModel extends AndroidViewModel {
         return data;
     }
 
-    public LiveData<ImagesResponseDto> getImageUrls(String authToken) {
+    public LiveData<ImagesResponseDto> getImageUrls(String authToken, int page) {
         MutableLiveData<ImagesResponseDto> data = new MutableLiveData<>();
 
-        mApiService.getImages(authToken, Integer.MAX_VALUE).enqueue(new Callback<ImagesResponseDto>() {
+        mApiService.getImages(authToken, page).enqueue(new Callback<ImagesResponseDto>() {
             @Override
             public void onResponse(Call<ImagesResponseDto> call, Response<ImagesResponseDto> response) {
                 if (response.isSuccessful()) {
@@ -67,7 +67,6 @@ public class ApiViewModel extends AndroidViewModel {
                     data.setValue(null);
                 }
             }
-
             @Override
             public void onFailure(Call<ImagesResponseDto> call, Throwable t) {
                 data.setValue(null);
@@ -77,10 +76,10 @@ public class ApiViewModel extends AndroidViewModel {
         return data;
     }
 
-    public LiveData<ParksResponseDto> getParks(String authToken) {
+    public LiveData<ParksResponseDto> getParks(String authToken, int page) {
         MutableLiveData<ParksResponseDto> data = new MutableLiveData<>();
 
-        mApiService.getParks(authToken, Integer.MAX_VALUE).enqueue(new Callback<ParksResponseDto>() {
+        mApiService.getParks(authToken, page).enqueue(new Callback<ParksResponseDto>() {
             @Override
             public void onResponse(Call<ParksResponseDto> call, Response<ParksResponseDto> response) {
                 if (response.isSuccessful()) {
@@ -99,10 +98,10 @@ public class ApiViewModel extends AndroidViewModel {
         return data;
     }
 
-    public LiveData<StatusesResponseDto> getStatuses(String authToken) {
+    public LiveData<StatusesResponseDto> getStatuses(String authToken, int page) {
         MutableLiveData<StatusesResponseDto> data = new MutableLiveData<>();
 
-        mApiService.getStatuses(authToken, Integer.MAX_VALUE).enqueue(new Callback<StatusesResponseDto>() {
+        mApiService.getStatuses(authToken, page).enqueue(new Callback<StatusesResponseDto>() {
             @Override
             public void onResponse(Call<StatusesResponseDto> call, Response<StatusesResponseDto> response) {
                 if (response.isSuccessful()) {
