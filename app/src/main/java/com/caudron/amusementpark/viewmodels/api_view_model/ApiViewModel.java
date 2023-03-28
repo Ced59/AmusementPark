@@ -38,13 +38,11 @@ public class ApiViewModel extends AndroidViewModel {
 
     public LiveData<CoastersResponseDto> getCoasters(String authToken, int page) {
         MutableLiveData<CoastersResponseDto> data = new MutableLiveData<>();
-        final CoastersResponseDto[] responseApi = {new CoastersResponseDto()};
-        // FAIRE UN SYSTEME POUR TOUT RECUPERER
-        mApiService.getCoasters(authToken,  page).enqueue(new Callback<CoastersResponseDto>() {
+        mApiService.getCoasters(authToken, page).enqueue(new Callback<CoastersResponseDto>() {
             @Override
             public void onResponse(Call<CoastersResponseDto> call, Response<CoastersResponseDto> response) {
                 if (response.isSuccessful()) {
-                    responseApi[0] = response.body();
+                    data.setValue(response.body());
                 } else {
                     data.setValue(null);
                 }
@@ -54,8 +52,6 @@ public class ApiViewModel extends AndroidViewModel {
                 data.setValue(null);
             }
         });
-
-
         return data;
     }
 

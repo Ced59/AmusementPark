@@ -6,31 +6,30 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.caudron.amusementpark.R;
-import com.caudron.amusementpark.models.dtos.CoasterDto;
 import com.caudron.amusementpark.models.dtos.CoastersResponseDto;
-import com.caudron.amusementpark.models.dtos.ImageDto;
 import com.caudron.amusementpark.models.dtos.ImagesResponseDto;
-import com.caudron.amusementpark.models.dtos.ParkDto;
 import com.caudron.amusementpark.models.dtos.ParksResponseDto;
-import com.caudron.amusementpark.models.dtos.StatusDto;
 import com.caudron.amusementpark.models.dtos.StatusesResponseDto;
 import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModel;
 import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModelFactory;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
 import com.caudron.amusementpark.views.MainActivity;
 
-import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
     private ProgressBar mLoaderIcon;
-    private TextView mBackgroundTaskInfo;
+    private TextView mBackgroundTaskInfoType;
+    private TextView mBackgroundTaskInfoProgress;
+
+    private int coasterNbPages = 0;
 
     private ApiViewModel mApiViewModel;
     private DatabaseViewModel mDatabaseViewModel;
@@ -43,7 +42,9 @@ public class SplashScreenActivity extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
 
         mLoaderIcon = findViewById(R.id.loaderIcon);
-        mBackgroundTaskInfo = findViewById(R.id.backgroundTaskInfo);
+        mBackgroundTaskInfoType = findViewById(R.id.backgroundTaskInfoType);
+        mBackgroundTaskInfoProgress = findViewById(R.id.backgroundTaskInfoProgress);
+
 
         mApiViewModel = new ViewModelProvider(this, new ApiViewModelFactory(getApplication(), mAuthToken)).get(ApiViewModel.class);
         mDatabaseViewModel = new ViewModelProvider(this).get(DatabaseViewModel.class);
@@ -52,14 +53,64 @@ public class SplashScreenActivity extends AppCompatActivity {
         loadCoasters();
     }
 
-    private void loadCoasters() {
-        mApiViewModel.getCoasters(mAuthToken, 1).observe(this, new Observer<CoastersResponseDto>() {
+    private void loadCoastersRecursive(final int currentPage, int nbPages) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mBackgroundTaskInfoProgress.setText("Chargement de la page n° " + currentPage + " sur " + nbPages);
+            }
+        });
+        mApiViewModel.getCoasters(mAuthToken, currentPage).observe(this, new Observer<CoastersResponseDto>() {
             @Override
             public void onChanged(CoastersResponseDto coasters) {
                 if (coasters != null && coasters.getCoasterDtos() != null) {
                     // Insert coasters into database
                     //mDatabaseViewModel.insertCoasters(coasters);
-                    loadImageUrls();
+
+                    Pattern pattern = Pattern.compile("page=(\\d+)");
+                    Matcher matcher = pattern.matcher(coasters.getViewDto().getLastPage());
+                    if (matcher.find()){
+                        String numberStr = matcher.group(1);
+                        coasterNbPages = Integer.parseInt(numberStr);
+                    }
+                    else {
+                        showErrorToast();
+                    }
+
+                    if (currentPage < coasterNbPages) {
+                        // Load next page recursively
+                        loadCoastersRecursive(currentPage + 1, coasterNbPages);
+                    } else {
+                        // This is the last page, so load image URLs now
+                        loadImageUrls();
+                    }
+                } else {
+                    showErrorToast();
+                }
+            }
+        });
+    }
+
+    private void loadCoasters() {
+        mBackgroundTaskInfoType.setText("Chargement des coasters...");
+        mApiViewModel.getCoasters(mAuthToken, 1).observe(this, new Observer<CoastersResponseDto>() {
+            @Override
+            public void onChanged(CoastersResponseDto coasters) {
+                if (coasters != null && coasters.getCoasterDtos() != null) {
+
+
+                    Pattern pattern = Pattern.compile("page=(\\d+)");
+                    Matcher matcher = pattern.matcher(coasters.getViewDto().getLastPage());
+                    if (matcher.find()){
+                        String numberStr = matcher.group(1);
+                        coasterNbPages = Integer.parseInt(numberStr);
+                    }
+                    else {
+                        showErrorToast();
+                    }
+
+
+                    loadCoastersRecursive(1, coasterNbPages); // Start loading pages recursively
                 } else {
                     showErrorToast();
                 }
