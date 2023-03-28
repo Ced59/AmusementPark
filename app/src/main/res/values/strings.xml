@@ -1,4 +1,9 @@
 <resources>
     <string name="app_name">AmusementPark</string>
     <string name="name_application">Amusement Park</string>
+    <string name="loading_progress">Chargement de la page n° %1$d sur %2$d</string>
+    <string name="loading_status">Chargement des statuts…</string>
+    <string name="loading_parks">Chargement des parcs…</string>
+    <string name="loading_images">Chargement des images…</string>
+    <string name="loading_coasters">Chargement des coasters…</string>
 </resources>

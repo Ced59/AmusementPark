@@ -2,6 +2,7 @@ package com.caudron.amusementpark.views.splashscreen;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.caudron.amusementpark.R;
+import com.caudron.amusementpark.models.dtos.BaseResponseDto;
 import com.caudron.amusementpark.models.dtos.CoastersResponseDto;
 import com.caudron.amusementpark.models.dtos.ImagesResponseDto;
 import com.caudron.amusementpark.models.dtos.ParksResponseDto;
@@ -32,13 +34,10 @@ public class SplashScreenActivity extends AppCompatActivity {
     private TextView mBackgroundTaskInfoType;
     private TextView mBackgroundTaskInfoProgress;
 
-    private int coasterNbPages = 0;
-    private int imagesNbPages = 0;
-
     private ApiViewModel mApiViewModel;
     private DatabaseViewModel mDatabaseViewModel;
 
-    private String mAuthToken = "a44c7304-5658-4434-b8ca-aa24d0c07845";
+    private final String mAuthToken = "a44c7304-5658-4434-b8ca-aa24d0c07845";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,12 +58,15 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
     private void loadCoasters() {
-        mBackgroundTaskInfoType.setText("Chargement des coasters...");
+        mBackgroundTaskInfoType.setText(R.string.loading_coasters);
         mApiViewModel.getCoasters(mAuthToken, 1).observe(this, new Observer<CoastersResponseDto>() {
             @Override
             public void onChanged(CoastersResponseDto coasters) {
                 if (coasters != null && coasters.getCoasterDtos() != null) {
-                    int nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
+                    int nbPages = 1;
+                    if (coasters.getViewDto() != null) {
+                        nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
+                    }
                     loadDataRecursive(1, nbPages, mApiViewModel::getCoasters, mAuthToken);
                 } else {
                     showErrorToast();
@@ -74,12 +76,15 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void loadImageUrls() {
-        mBackgroundTaskInfoType.setText("Chargement des images...");
+        mBackgroundTaskInfoType.setText(R.string.loading_images);
         mApiViewModel.getImageUrls(mAuthToken, 1).observe(this, new Observer<ImagesResponseDto>() {
             @Override
             public void onChanged(ImagesResponseDto images) {
                 if (images != null && images.getImageDtos() != null) {
-                    int nbPages = extractPageNumber(images.getViewDto().getLastPage());
+                    int nbPages = 1;
+                    if (images.getViewDto() != null) {
+                        nbPages = extractPageNumber(images.getViewDto().getLastPage());
+                    }
                     loadDataRecursive(1, nbPages, mApiViewModel::getImageUrls, mAuthToken);
                 } else {
                     showErrorToast();
@@ -90,12 +95,15 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
     private void loadParks() {
-        mBackgroundTaskInfoType.setText("Chargement des parcs...");
+        mBackgroundTaskInfoType.setText(R.string.loading_parks);
         mApiViewModel.getParks(mAuthToken, 1).observe(this, new Observer<ParksResponseDto>() {
             @Override
             public void onChanged(ParksResponseDto parks) {
                 if (parks != null && parks.getParks() != null) {
-                    int nbPages = extractPageNumber(parks.getViewDto().getLastPage());
+                    int nbPages = 1;
+                    if (parks.getViewDto() != null) {
+                        nbPages = extractPageNumber(parks.getViewDto().getLastPage());
+                    }
                     loadDataRecursive(1, nbPages, mApiViewModel::getParks, mAuthToken);
                 } else {
                     showErrorToast();
@@ -105,12 +113,15 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void loadStatuses() {
-        mBackgroundTaskInfoType.setText("Chargement des statuts...");
+        mBackgroundTaskInfoType.setText(R.string.loading_status);
         mApiViewModel.getStatuses(mAuthToken, 1).observe(this, new Observer<StatusesResponseDto>() {
             @Override
             public void onChanged(StatusesResponseDto statuses) {
                 if (statuses != null && statuses.getStatuses() != null) {
-                    int nbPages = extractPageNumber(statuses.getViewDto().getLastPage());
+                    int nbPages = 1;
+                    if (statuses.getViewDto() != null){
+                        nbPages = extractPageNumber(statuses.getViewDto().getLastPage());
+                    }
                     loadDataRecursive(1, nbPages, mApiViewModel::getStatuses, mAuthToken);
                 } else {
                     showErrorToast();
@@ -124,41 +135,56 @@ public class SplashScreenActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                mBackgroundTaskInfoProgress.setText("Chargement de la page n° " + currentPage + " sur " + nbPages);
+                mBackgroundTaskInfoProgress.setText(getString(R.string.loading_progress, currentPage, nbPages));
             }
         });
         apiCall.invoke(authToken, currentPage).observe(this, new Observer<T>() {
             @Override
             public void onChanged(T data) {
                 if (data != null) {
-                    int nbPages = 0;
-                    if (data instanceof CoastersResponseDto) {
-                        CoastersResponseDto coasters = (CoastersResponseDto) data;
-                        nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
-                        // Insert coasters into database
-                        //mDatabaseViewModel.insertCoasters(coasters);
-                    } else if (data instanceof ImagesResponseDto) {
-                        ImagesResponseDto images = (ImagesResponseDto) data;
-                        nbPages = extractPageNumber(images.getViewDto().getLastPage());
-                        // Insert images into database
-                        //mDatabaseViewModel.insertImages(images);
-                    } else if (data instanceof  ParksResponseDto){
-                        ParksResponseDto parks = (ParksResponseDto) data;
-                        nbPages = extractPageNumber(parks.getViewDto().getLastPage());
+                    int nbPages = 1;
+                    switch (data.getClass().getSimpleName()) {
+                        case "CoastersResponseDto":
+                            CoastersResponseDto coasters = (CoastersResponseDto) data;
+                            nbPages = getNbPages(coasters);
+                            // Insert coasters into database
+                            //mDatabaseViewModel.insertCoasters(coasters);
+                            break;
+                        case "ImagesResponseDto":
+                            ImagesResponseDto images = (ImagesResponseDto) data;
+                            nbPages = getNbPages(images);
+                            // Insert images into database
+                            //mDatabaseViewModel.insertImages(images);
+                            break;
+                        case "ParksResponseDto":
+                            ParksResponseDto parks = (ParksResponseDto) data;
+                            nbPages = getNbPages(parks);
+                            break;
+                        case "StatusesResponseDto":
+                            StatusesResponseDto statuses = (StatusesResponseDto) data;
+                            nbPages = getNbPages(statuses);
+                            break;
+                        default:
+                            break;
                     }
 
                     if (currentPage < nbPages) {
                         // Load next page recursively
                         loadDataRecursive(currentPage + 1, nbPages, apiCall, authToken);
                     } else {
-                        if (data instanceof CoastersResponseDto){
-                            loadImageUrls();
-                        } else if (data instanceof ImagesResponseDto) {
-                            loadParks();
-                        } else if (data instanceof  ParksResponseDto){
-                            loadStatuses();
-                        } else {
-                            launchMainActivity();
+                        switch (data.getClass().getSimpleName()) {
+                            case "CoastersResponseDto":
+                                loadImageUrls();
+                                break;
+                            case "ImagesResponseDto":
+                                loadParks();
+                                break;
+                            case "ParksResponseDto":
+                                loadStatuses();
+                                break;
+                            default:
+                                launchMainActivity();
+                                break;
                         }
                     }
                 } else {
@@ -188,6 +214,15 @@ public class SplashScreenActivity extends AppCompatActivity {
             return Integer.parseInt(numberStr);
         } else {
             return 0;
+        }
+    }
+
+    private int getNbPages(BaseResponseDto dataResponseDto) {
+        if (dataResponseDto.getViewDto() != null && dataResponseDto.getViewDto().getLastPage() != null) {
+            return extractPageNumber(dataResponseDto.getViewDto().getLastPage());
+        }
+        else {
+            return 1;
         }
     }
 }

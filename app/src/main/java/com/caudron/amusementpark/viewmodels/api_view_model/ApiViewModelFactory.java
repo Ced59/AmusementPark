@@ -2,6 +2,7 @@ package com.caudron.amusementpark.viewmodels.api_view_model;
 
 import android.app.Application;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -15,6 +16,7 @@ public class ApiViewModelFactory implements ViewModelProvider.Factory {
         mToken = token;
     }
 
+    @NonNull
     @Override
     public <T extends ViewModel> T create(Class<T> modelClass) {
         if (modelClass.isAssignableFrom(ApiViewModel.class)) {
