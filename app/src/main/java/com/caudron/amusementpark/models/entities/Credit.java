@@ -1,7 +1,6 @@
 package com.caudron.amusementpark.models.entities;
 
 public class Credit {
-    private int id;
     private String coaster;
     private String credit;
     private Image image;
@@ -30,11 +29,4 @@ public class Credit {
         this.credit = credit;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 }
