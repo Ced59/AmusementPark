@@ -2,12 +2,14 @@ package com.caudron.amusementpark.viewmodels.database_view_model;
 
 import android.app.Application;
 import android.content.Context;
+import android.database.sqlite.SQLiteConstraintException;
 
 import androidx.lifecycle.AndroidViewModel;
 
 import com.caudron.amusementpark.models.db.repositories.daos.CoasterDao;
 import com.caudron.amusementpark.models.db.repositories.daos.CountryDao;
 import com.caudron.amusementpark.models.db.repositories.daos.ImageDao;
+import com.caudron.amusementpark.models.db.repositories.daos.MaterialTypeDao;
 import com.caudron.amusementpark.models.db.repositories.daos.ParkDao;
 import com.caudron.amusementpark.models.db.repositories.daos.StatusDao;
 import com.caudron.amusementpark.models.db.repositories.implementations.AmusementParkDatabase;
@@ -75,8 +77,14 @@ public class DatabaseViewModel extends AndroidViewModel {
             }
 
             if (materialType != null){
-                MaterialType existingMaterialType = db.materialTypeDao().getByName(materialType.getName());
-
+                try {
+                    db.materialTypeDao().insert(materialType);
+                } catch (SQLiteConstraintException e) {
+                    MaterialType existingMaterialType = db.materialTypeDao().getByName(materialType.getName());
+                    if (existingMaterialType != null){
+                        db.materialTypeDao().update(materialType);
+                    }
+                }
             }
         }
     }
@@ -160,5 +168,11 @@ public class DatabaseViewModel extends AndroidViewModel {
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         CountryDao countryDao = db.countryDao();
         return  countryDao.getCount();
+    }
+
+    public int getCountMaterialType(Context context) {
+        AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
+        MaterialTypeDao materialTypeDao = db.materialTypeDao();
+        return materialTypeDao.getCount();
     }
 }

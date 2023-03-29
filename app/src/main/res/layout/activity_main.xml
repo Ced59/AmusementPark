@@ -28,4 +28,10 @@
         android:layout_height="wrap_content"
         android:text="Nombre d'images' dans la base de données: " />
 
+    <TextView
+        android:id="@+id/materialType_count_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre de type de matériel dans la base de données: " />
+
 </LinearLayout>

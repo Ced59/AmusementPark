@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
                 final int countParks = mDatabaseViewModel.getCountParks(getApplicationContext());
                 final int countImages = mDatabaseViewModel.getCountImages(getApplicationContext());
                 final int countCountries = mDatabaseViewModel.getCountCountries(getApplicationContext());
+                final int countMaterialType = mDatabaseViewModel.getCountMaterialType(getApplicationContext());
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -42,6 +43,9 @@ public class MainActivity extends AppCompatActivity {
 
                         TextView textViewCountCountries = findViewById(R.id.countries_count_textview);
                         textViewCountCountries.setText("Nombre de pays dans la db : " + countCountries);
+
+                        TextView textViewCountMaterialType = findViewById(R.id.materialType_count_textview);
+                        textViewCountMaterialType.setText("Nombre de MaterialType dans la db : " + countMaterialType);
                     }
                 });
             }
