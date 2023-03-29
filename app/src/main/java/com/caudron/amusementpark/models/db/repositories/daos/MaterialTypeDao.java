@@ -24,13 +24,19 @@ public interface MaterialTypeDao {
     @Delete
     void delete(MaterialType materialType);
 
+    //TODO Remettre Single
     @Query("SELECT * FROM materialtypes WHERE name = :name")
     MaterialType getByName(String name);
 
+    //TODO Remettre Flowable
     @Query("SELECT * FROM materialtypes")
     List<MaterialType> getAll();
 
     @Query("SELECT COUNT(*) FROM materialtypes")
     int getCount();
+
+
+
+    //TODO Valable pour toutes les classes DAO! (pfff ca fait du boulot pour subscribe ect...)
 }
 
