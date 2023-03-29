@@ -1,11 +1,21 @@
 package com.caudron.amusementpark.models.entities;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.Relation;
+
 import java.util.List;
 
+@Entity(tableName = "countries")
 public class Country {
+    @PrimaryKey
+    @NonNull
     private int id;
     private String name;
     private boolean isRateable;
+    @Ignore
     private List<Park> parks;
 
     public int getId() {

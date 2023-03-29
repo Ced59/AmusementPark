@@ -23,6 +23,8 @@ import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModelFactory;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
 import com.caudron.amusementpark.views.MainActivity;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -148,21 +150,52 @@ public class SplashScreenActivity extends AppCompatActivity {
                             CoastersResponseDto coasters = (CoastersResponseDto) data;
                             nbPages = getNbPages(coasters);
                             // Insert coasters into database
-                            mDatabaseViewModel.insertCoasters(coasters);
+                            ExecutorService executorServiceCoasters = Executors.newSingleThreadExecutor();
+                            executorServiceCoasters.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mDatabaseViewModel.insertCoasters(coasters, getApplicationContext());
+                                }
+                            });
+                            executorServiceCoasters.shutdown();
                             break;
                         case "ImagesResponseDto":
                             ImagesResponseDto images = (ImagesResponseDto) data;
                             nbPages = getNbPages(images);
                             // Insert images into database
-                            //mDatabaseViewModel.insertImages(images);
+                            ExecutorService executorServiceImages = Executors.newSingleThreadExecutor();
+                            executorServiceImages.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mDatabaseViewModel.insertImages(images, getApplicationContext());
+                                }
+                            });
+                            executorServiceImages.shutdown();
+
                             break;
                         case "ParksResponseDto":
                             ParksResponseDto parks = (ParksResponseDto) data;
                             nbPages = getNbPages(parks);
+                            ExecutorService executorServiceParks = Executors.newSingleThreadExecutor();
+                            executorServiceParks.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mDatabaseViewModel.insertParks(parks, getApplicationContext());
+                                }
+                            });
+                            executorServiceParks.shutdown();
                             break;
                         case "StatusesResponseDto":
                             StatusesResponseDto statuses = (StatusesResponseDto) data;
                             nbPages = getNbPages(statuses);
+                            ExecutorService executorServiceStatuses = Executors.newSingleThreadExecutor();
+                            executorServiceStatuses.execute(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mDatabaseViewModel.insertStatuses(statuses, getApplicationContext());
+                                }
+                            });
+                            executorServiceStatuses.shutdown();
                             break;
                         default:
                             break;

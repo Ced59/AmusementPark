@@ -1,25 +1,47 @@
 package com.caudron.amusementpark.models.entities;
 
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import androidx.room.Relation;
+
 import java.util.List;
 
+@Entity(tableName = "coasters")
 public class Coaster {
+    @PrimaryKey
+    @NonNull
     private int id;
     private String name;
+    private String materialTypeId;
+    @Ignore
     private MaterialType materialType;
+    private int seatingTypeId;
+    @Ignore
     private SeatingType seatingType;
     private int speed;
     private int height;
     private int length;
     private int inversionsNumber;
+    private int manufacturerId;
+    @Ignore
     private Manufacturer manufacturer;
+    private int parkId;
+    @Ignore
     private Park park;
+    private String statusId;
+    @Ignore
     private Status status;
     private int totalRatings;
     private int validDuels;
     private String score;
     private int rank;
+    private int imageId;
+    @Ignore
     private Image mainImage;
+    @Ignore
     private List<Credit> credits;
 
     public int getId() {
@@ -156,6 +178,54 @@ public class Coaster {
 
     public void setCredits(List<Credit> credits) {
         this.credits = credits;
+    }
+
+    public int getParkId() {
+        return parkId;
+    }
+
+    public void setParkId(int parkId) {
+        this.parkId = parkId;
+    }
+
+    public String getMaterialTypeId() {
+        return materialTypeId;
+    }
+
+    public void setMaterialTypeId(String materialTypeId) {
+        this.materialTypeId = materialTypeId;
+    }
+
+    public int getManufacturerId() {
+        return manufacturerId;
+    }
+
+    public void setManufacturerId(int manufacturerId) {
+        this.manufacturerId = manufacturerId;
+    }
+
+    public int getSeatingTypeId() {
+        return seatingTypeId;
+    }
+
+    public void setSeatingTypeId(int seatingTypeId) {
+        this.seatingTypeId = seatingTypeId;
+    }
+
+    public String getStatusId() {
+        return statusId;
+    }
+
+    public void setStatusId(String statusId) {
+        this.statusId = statusId;
+    }
+
+    public int getImageId() {
+        return imageId;
+    }
+
+    public void setImageId(int imageId) {
+        this.imageId = imageId;
     }
 }
 

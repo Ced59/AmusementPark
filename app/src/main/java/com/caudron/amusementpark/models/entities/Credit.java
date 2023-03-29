@@ -1,8 +1,17 @@
 package com.caudron.amusementpark.models.entities;
 
+import androidx.annotation.NonNull;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "credit")
 public class Credit {
+    @PrimaryKey
+    @NonNull
     private String coaster;
     private String credit;
+    @Ignore
     private Image image;
 
     public Image getImage() {
