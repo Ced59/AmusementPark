@@ -4,6 +4,8 @@ import android.app.Application;
 
 import androidx.lifecycle.AndroidViewModel;
 
+import com.caudron.amusementpark.models.dtos.CoastersResponseDto;
+
 
 public class DatabaseViewModel extends AndroidViewModel {
 
@@ -12,6 +14,6 @@ public class DatabaseViewModel extends AndroidViewModel {
     }
 
 
-
-
+    public void insertCoasters(CoastersResponseDto coasters) {
+    }
 }

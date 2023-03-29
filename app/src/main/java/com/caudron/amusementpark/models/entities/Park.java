@@ -1,9 +1,10 @@
-package com.caudron.amusementpark.models.dtos;
+package com.caudron.amusementpark.models.entities;
 
-public class ParkDto {
+
+public class Park {
     private int id;
     private String name;
-    private CountryDto country;
+    private Country country;
     private double latitude;
     private double longitude;
 
@@ -23,11 +24,11 @@ public class ParkDto {
         this.name = name;
     }
 
-    public CountryDto getCountry() {
+    public Country getCountry() {
         return country;
     }
 
-    public void setCountry(CountryDto country) {
+    public void setCountry(Country country) {
         this.country = country;
     }
 
@@ -46,5 +47,4 @@ public class ParkDto {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
-
 }

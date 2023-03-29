@@ -14,15 +14,12 @@ public interface ApiService {
     @GET("coasters")
     Call<CoastersResponseDto> getCoasters(@Header("X-AUTH-TOKEN") String authToken, @Query("page") int page);
 
-    // Exemple de méthode pour récupérer la liste des images
     @GET("images")
     Call<ImagesResponseDto> getImages(@Header("X-AUTH-TOKEN") String authToken, @Query("page") int page);
 
-    // Exemple de méthode pour récupérer la liste des parcs d'attractions
     @GET("parks")
     Call<ParksResponseDto> getParks(@Header("X-AUTH-TOKEN") String authToken, @Query("page") int page);
 
-    // Exemple de méthode pour récupérer la liste des statuts
     @GET("statuses")
     Call<StatusesResponseDto> getStatuses(@Header("X-AUTH-TOKEN") String authToken, @Query("page") int page);
 }

@@ -148,7 +148,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                             CoastersResponseDto coasters = (CoastersResponseDto) data;
                             nbPages = getNbPages(coasters);
                             // Insert coasters into database
-                            //mDatabaseViewModel.insertCoasters(coasters);
+                            mDatabaseViewModel.insertCoasters(coasters);
                             break;
                         case "ImagesResponseDto":
                             ImagesResponseDto images = (ImagesResponseDto) data;
