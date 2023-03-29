@@ -1,14 +1,6 @@
 package com.caudron.amusementpark.models.entities;
 
 
-import com.caudron.amusementpark.models.dtos.CreditDto;
-import com.caudron.amusementpark.models.dtos.ImageDto;
-import com.caudron.amusementpark.models.dtos.ManufacturerDto;
-import com.caudron.amusementpark.models.dtos.MaterialTypeDto;
-import com.caudron.amusementpark.models.dtos.ParkDto;
-import com.caudron.amusementpark.models.dtos.SeatingTypeDto;
-import com.caudron.amusementpark.models.dtos.StatusDto;
-
 import java.util.List;
 
 public class Coaster {

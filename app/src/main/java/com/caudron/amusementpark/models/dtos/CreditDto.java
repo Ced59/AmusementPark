@@ -3,6 +3,7 @@ package com.caudron.amusementpark.models.dtos;
 public class CreditDto {
     private String coaster;
     private String credit;
+    private ImageDto image;
 
     public String getCoaster() {
         return coaster;
@@ -28,5 +29,5 @@ public class CreditDto {
         this.image = image;
     }
 
-    private ImageDto image;
+
 }
