@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
                 final int countCoasters = mDatabaseViewModel.getCountCoasters(getApplicationContext());
                 final int countParks = mDatabaseViewModel.getCountParks(getApplicationContext());
                 final int countImages = mDatabaseViewModel.getCountImages(getApplicationContext());
+                final int countCountries = mDatabaseViewModel.getCountCountries(getApplicationContext());
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -38,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
 
                         TextView textViewCountImages = findViewById(R.id.images_count_textview);
                         textViewCountImages.setText("Nombre d'images dans la db: " + countImages);
+
+                        TextView textViewCountCountries = findViewById(R.id.countries_count_textview);
+                        textViewCountCountries.setText("Nombre de pays dans la db : " + countCountries);
                     }
                 });
             }

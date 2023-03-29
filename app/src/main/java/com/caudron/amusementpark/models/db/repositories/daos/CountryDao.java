@@ -24,10 +24,10 @@ public interface CountryDao {
     void delete(Country country);
 
     @Query("SELECT * FROM countries WHERE id = :countryId")
-    Flowable<Country> getCountryById(int countryId);
+    Country getCountryById(int countryId);
 
     @Query("SELECT * FROM countries WHERE isRateable = 1")
-    Flowable<List<Country>> getRateableCountries();
+    List<Country> getRateableCountries();
 
     @Query("SELECT COUNT(*) FROM countries")
     int getCount();

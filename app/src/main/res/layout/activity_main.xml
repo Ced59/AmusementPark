@@ -22,4 +22,10 @@
         android:layout_height="wrap_content"
         android:text="Nombre d'images' dans la base de données: " />
 
+    <TextView
+        android:id="@+id/countries_count_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre d'images' dans la base de données: " />
+
 </LinearLayout>

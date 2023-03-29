@@ -18,14 +18,14 @@ public class Coaster {
     private String materialTypeId;
     @Ignore
     private MaterialType materialType;
-    private int seatingTypeId;
+    private String seatingTypeId;
     @Ignore
     private SeatingType seatingType;
     private int speed;
     private int height;
     private int length;
     private int inversionsNumber;
-    private int manufacturerId;
+    private String manufacturerId;
     @Ignore
     private Manufacturer manufacturer;
     private int parkId;
@@ -38,11 +38,10 @@ public class Coaster {
     private int validDuels;
     private String score;
     private int rank;
-    private int imageId;
+    private String imageId;
     @Ignore
     private Image mainImage;
-    @Ignore
-    private List<Credit> credits;
+
 
     public int getId() {
         return id;
@@ -172,14 +171,6 @@ public class Coaster {
         this.mainImage = mainImage;
     }
 
-    public List<Credit> getCredits() {
-        return credits;
-    }
-
-    public void setCredits(List<Credit> credits) {
-        this.credits = credits;
-    }
-
     public int getParkId() {
         return parkId;
     }
@@ -196,19 +187,19 @@ public class Coaster {
         this.materialTypeId = materialTypeId;
     }
 
-    public int getManufacturerId() {
+    public String getManufacturerId() {
         return manufacturerId;
     }
 
-    public void setManufacturerId(int manufacturerId) {
+    public void setManufacturerId(String manufacturerId) {
         this.manufacturerId = manufacturerId;
     }
 
-    public int getSeatingTypeId() {
+    public String getSeatingTypeId() {
         return seatingTypeId;
     }
 
-    public void setSeatingTypeId(int seatingTypeId) {
+    public void setSeatingTypeId(String seatingTypeId) {
         this.seatingTypeId = seatingTypeId;
     }
 
@@ -220,11 +211,11 @@ public class Coaster {
         this.statusId = statusId;
     }
 
-    public int getImageId() {
+    public String getImageId() {
         return imageId;
     }
 
-    public void setImageId(int imageId) {
+    public void setImageId(String imageId) {
         this.imageId = imageId;
     }
 }

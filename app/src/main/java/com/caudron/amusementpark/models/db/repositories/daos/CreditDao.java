@@ -24,13 +24,13 @@ public interface CreditDao {
     @Delete
     void delete(Credit credit);
 
-    @Query("SELECT * FROM credit WHERE coaster = :coasterName")
+    @Query("SELECT * FROM credits WHERE coaster = :coasterName")
     Single<List<Credit>> getByCoasterName(String coasterName);
 
-    @Query("SELECT * FROM credit")
+    @Query("SELECT * FROM credits")
     Flowable<List<Credit>> getAll();
 
-    @Query("SELECT COUNT(*) FROM credit")
+    @Query("SELECT COUNT(*) FROM credits")
     int getCount();
 }
 

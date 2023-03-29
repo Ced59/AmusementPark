@@ -25,10 +25,10 @@ public interface MaterialTypeDao {
     void delete(MaterialType materialType);
 
     @Query("SELECT * FROM materialtypes WHERE name = :name")
-    Single<MaterialType> getByName(String name);
+    MaterialType getByName(String name);
 
     @Query("SELECT * FROM materialtypes")
-    Flowable<List<MaterialType>> getAll();
+    List<MaterialType> getAll();
 
     @Query("SELECT COUNT(*) FROM materialtypes")
     int getCount();

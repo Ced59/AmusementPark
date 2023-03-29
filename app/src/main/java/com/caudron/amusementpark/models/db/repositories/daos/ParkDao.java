@@ -25,7 +25,7 @@ public interface ParkDao {
     void delete(Park park);
 
     @Query("SELECT * FROM parks WHERE id = :id")
-    Single<Park> getById(int id);
+    Park getById(int id);
 
     @Query("SELECT * FROM parks WHERE countryId = :countryId")
     Flowable<List<Park>> getByCountryId(int countryId);

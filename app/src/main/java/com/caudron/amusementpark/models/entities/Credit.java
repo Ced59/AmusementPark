@@ -5,7 +5,7 @@ import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "credit")
+@Entity(tableName = "credits")
 public class Credit {
     @PrimaryKey
     @NonNull
