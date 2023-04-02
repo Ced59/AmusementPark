@@ -1,6 +1,8 @@
 package com.caudron.amusementpark.views;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.os.Bundle;
@@ -23,29 +25,48 @@ public class MainActivity extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                final int countCoasters = mDatabaseViewModel.getCountCoasters(getApplicationContext());
-                final int countParks = mDatabaseViewModel.getCountParks(getApplicationContext());
-                final int countImages = mDatabaseViewModel.getCountImages(getApplicationContext());
+                final LiveData<Integer> countCoasters = mDatabaseViewModel.getCountCoasters(getApplicationContext());
+                final LiveData<Integer> countParks = mDatabaseViewModel.getCountParks(getApplicationContext());
+                final LiveData<Integer> countImages = mDatabaseViewModel.getCountImages(getApplicationContext());
                 final int countCountries = mDatabaseViewModel.getCountCountries(getApplicationContext());
                 final int countMaterialType = mDatabaseViewModel.getCountMaterialType(getApplicationContext());
+                final int countStatuses = mDatabaseViewModel.getCountStatuses(getApplicationContext());
 
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        TextView textViewCountCoaster = findViewById(R.id.coaster_count_textview);
-                        textViewCountCoaster.setText("Nombre de coasters dans la db: " + countCoasters);
+                        countCoasters.observe(MainActivity.this, new Observer<Integer>() {
+                            @Override
+                            public void onChanged(Integer count) {
+                                TextView textViewCountCoaster = findViewById(R.id.coaster_count_textview);
+                                textViewCountCoaster.setText("Nombre de coasters dans la db: " + count);
+                            }
+                        });
 
-                        TextView textViewCountParks = findViewById(R.id.park_count_textview);
-                        textViewCountParks.setText("Nombre de parcs dans la db: " + countParks);
+                        countParks.observe(MainActivity.this, new Observer<Integer>() {
+                            @Override
+                            public void onChanged(Integer count) {
+                                TextView textViewCountParks = findViewById(R.id.park_count_textview);
+                                textViewCountParks.setText("Nombre de parcs dans la db: " + count);
+                            }
+                        });
 
-                        TextView textViewCountImages = findViewById(R.id.images_count_textview);
-                        textViewCountImages.setText("Nombre d'images dans la db: " + countImages);
+                        countImages.observe(MainActivity.this, new Observer<Integer>() {
+                            @Override
+                            public void onChanged(Integer count) {
+                                TextView textViewCountImages = findViewById(R.id.images_count_textview);
+                                textViewCountImages.setText("Nombre d'images dans la db: " + count);
+                            }
+                        });
 
                         TextView textViewCountCountries = findViewById(R.id.countries_count_textview);
                         textViewCountCountries.setText("Nombre de pays dans la db : " + countCountries);
 
                         TextView textViewCountMaterialType = findViewById(R.id.materialType_count_textview);
                         textViewCountMaterialType.setText("Nombre de MaterialType dans la db : " + countMaterialType);
+
+                        TextView textViewCountStatuses = findViewById(R.id.statuses_count_textview);
+                        textViewCountStatuses.setText("Nombre de Status dans la db : " + countStatuses);
                     }
                 });
             }

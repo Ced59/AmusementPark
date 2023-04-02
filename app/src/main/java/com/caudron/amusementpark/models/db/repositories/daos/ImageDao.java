@@ -1,5 +1,6 @@
 package com.caudron.amusementpark.models.db.repositories.daos;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -28,6 +29,6 @@ public interface ImageDao {
     Image getByPath(String path);
 
     @Query("SELECT COUNT(*) FROM images")
-    int getCount();
+    LiveData<Integer> getCount();
 }
 

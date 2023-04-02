@@ -11,19 +11,8 @@ import java.util.List;
 public class Country {
     @PrimaryKey
     @NonNull
-    private int id;
     private String name;
-    private boolean isRateable;
-    @Ignore
-    private List<Park> parks;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -33,19 +22,4 @@ public class Country {
         this.name = name;
     }
 
-    public boolean isRateable() {
-        return isRateable;
-    }
-
-    public void setRateable(boolean rateable) {
-        isRateable = rateable;
-    }
-
-    public List<Park> getParks() {
-        return parks;
-    }
-
-    public void setParks(List<Park> parks) {
-        this.parks = parks;
-    }
 }

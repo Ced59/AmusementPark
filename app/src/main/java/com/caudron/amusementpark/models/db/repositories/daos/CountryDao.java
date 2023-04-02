@@ -8,10 +8,6 @@ import androidx.room.Update;
 
 import com.caudron.amusementpark.models.entities.Country;
 
-import java.util.List;
-
-import io.reactivex.Flowable;
-
 @Dao
 public interface CountryDao {
     @Insert
@@ -23,11 +19,9 @@ public interface CountryDao {
     @Delete
     void delete(Country country);
 
-    @Query("SELECT * FROM countries WHERE id = :countryId")
-    Country getCountryById(int countryId);
+    @Query("SELECT * FROM countries WHERE name = :countryName")
+    Country getCountryByName(String countryName);
 
-    @Query("SELECT * FROM countries WHERE isRateable = 1")
-    List<Country> getRateableCountries();
 
     @Query("SELECT COUNT(*) FROM countries")
     int getCount();

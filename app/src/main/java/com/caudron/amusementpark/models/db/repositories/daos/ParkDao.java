@@ -1,5 +1,6 @@
 package com.caudron.amusementpark.models.db.repositories.daos;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -34,5 +35,5 @@ public interface ParkDao {
     Flowable<List<Park>> getAll();
 
     @Query("SELECT COUNT(*) FROM parks")
-    int getCount();
+    LiveData<Integer> getCount();
 }

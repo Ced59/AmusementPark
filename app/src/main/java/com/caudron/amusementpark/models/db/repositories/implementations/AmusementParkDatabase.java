@@ -24,7 +24,7 @@ import com.caudron.amusementpark.models.entities.Park;
 import com.caudron.amusementpark.models.entities.SeatingType;
 import com.caudron.amusementpark.models.entities.Status;
 
-@Database(entities = {Coaster.class, Country.class, Credit.class, Image.class, Manufacturer.class, MaterialType.class, Park.class, SeatingType.class, Status.class}, version = 2, exportSchema = false)
+@Database(entities = {Coaster.class, Country.class, Credit.class, Image.class, Manufacturer.class, MaterialType.class, Park.class, SeatingType.class, Status.class}, version = 3, exportSchema = false)
 public abstract class AmusementParkDatabase extends RoomDatabase {
     private static final String DATABASE_NAME = "amusement_park_db";
     private static AmusementParkDatabase sInstance;

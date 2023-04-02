@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteConstraintException;
 
 import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
 
 import com.caudron.amusementpark.models.db.repositories.daos.CoasterDao;
 import com.caudron.amusementpark.models.db.repositories.daos.CountryDao;
@@ -19,7 +20,6 @@ import com.caudron.amusementpark.models.dtos.ParksResponseDto;
 import com.caudron.amusementpark.models.dtos.StatusesResponseDto;
 import com.caudron.amusementpark.models.entities.Coaster;
 import com.caudron.amusementpark.models.entities.Country;
-import com.caudron.amusementpark.models.entities.Credit;
 import com.caudron.amusementpark.models.entities.Image;
 import com.caudron.amusementpark.models.entities.Manufacturer;
 import com.caudron.amusementpark.models.entities.MaterialType;
@@ -27,6 +27,7 @@ import com.caudron.amusementpark.models.entities.Park;
 import com.caudron.amusementpark.models.entities.SeatingType;
 import com.caudron.amusementpark.models.entities.Status;
 import com.caudron.amusementpark.utils.UtilsMapping;
+import com.caudron.amusementpark.utils.UtilsStrings;
 
 import java.util.List;
 
@@ -40,6 +41,7 @@ public class DatabaseViewModel extends AndroidViewModel {
 
     public void insertCoasters(CoastersResponseDto coastersResponseDto, Context context) {
         List<Coaster> coasters = UtilsMapping.mapList(coastersResponseDto.getCoasterDtos(), Coaster.class);
+
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         CoasterDao coasterDao = db.coasterDao();
         for(Coaster coaster : coasters){
@@ -111,9 +113,8 @@ public class DatabaseViewModel extends AndroidViewModel {
         for(Park park : parks){
             Country country = park.getCountry();
             if (country != null){
-                park.setCountryId(country.getId());
+                park.setCountryId(country.getName());
             }
-
             Park existingPark = parkDao.getById(park.getId());
             if (existingPark == null){
                 parkDao.insert(park);
@@ -122,11 +123,16 @@ public class DatabaseViewModel extends AndroidViewModel {
             }
 
             if (country != null){
-                Country existingCountry = db.countryDao().getCountryById(country.getId());
-                if (existingCountry == null) {
+                try {
+                    String nameCountryApi = country.getName();
+                    String nameCountryFormatted = UtilsStrings.extractCountryName(nameCountryApi);
+                    country.setName(nameCountryFormatted);
                     db.countryDao().insert(country);
-                } else {
-                    db.countryDao().update(country);
+                } catch (SQLiteConstraintException e) {
+                    Country existingCountry = db.countryDao().getCountryByName(country.getName());
+                    if (existingCountry != null){
+                        db.countryDao().update(country);
+                    }
                 }
             }
         }
@@ -139,6 +145,9 @@ public class DatabaseViewModel extends AndroidViewModel {
         for(Status status : statuses){
             Status existingStatus = statusDao.getByName(status.getName());
             if (existingStatus == null){
+                String nameStatusApi = status.getName();
+                String nameStatusFormatted = UtilsStrings.extractStatus(nameStatusApi);
+                status.setName(nameStatusFormatted);
                 statusDao.insert(status);
             }else {
                 statusDao.update(status);
@@ -146,19 +155,19 @@ public class DatabaseViewModel extends AndroidViewModel {
         }
     }
 
-    public int getCountCoasters(Context context){
+    public LiveData<Integer> getCountCoasters(Context context){
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         CoasterDao coasterDao = db.coasterDao();
         return coasterDao.getCount();
     }
 
-    public int getCountParks(Context context){
+    public LiveData<Integer> getCountParks(Context context){
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         ParkDao parkDao = db.parkDao();
         return parkDao.getCount();
     }
 
-    public int getCountImages(Context context){
+    public LiveData<Integer> getCountImages(Context context){
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         ImageDao imageDao = db.imageDao();
         return imageDao.getCount();
@@ -174,5 +183,11 @@ public class DatabaseViewModel extends AndroidViewModel {
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         MaterialTypeDao materialTypeDao = db.materialTypeDao();
         return materialTypeDao.getCount();
+    }
+
+    public int getCountStatuses(Context context) {
+        AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
+        StatusDao statusDao = db.statusDao();
+        return statusDao.getCount();
     }
 }

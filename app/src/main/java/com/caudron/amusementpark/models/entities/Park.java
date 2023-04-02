@@ -14,7 +14,7 @@ public class Park {
     private int id;
     private String name;
     @ColumnInfo(name = "countryId")
-    private int countryId;
+    private String countryId;
     @Ignore
     private Country country;
     private double latitude;
@@ -36,11 +36,11 @@ public class Park {
         this.name = name;
     }
 
-    public int getCountryId() {
+    public String getCountryId() {
         return countryId;
     }
 
-    public void setCountryId(int countryId) {
+    public void setCountryId(String countryId) {
         this.countryId = countryId;
     }
 
