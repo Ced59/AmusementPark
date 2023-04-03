@@ -13,11 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AmusementPark"
         tools:targetApi="31">
+
         <activity
-            android:name=".views.splashscreen.SplashScreenActivity"
+            android:name=".views.starting_activities.SplashScreenActivity"
             android:exported="true"
-            android:theme="@style/SplashTheme"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/GeneralTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,9 +26,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".views.starting_activities.GeneralConfigActivity"
+            android:exported="false"/>
+        <activity
             android:name=".views.MainActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false"/>
     </application>
 
 </manifest>

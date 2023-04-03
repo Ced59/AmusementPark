@@ -9,6 +9,8 @@ import androidx.room.Update;
 
 import com.caudron.amusementpark.models.entities.Country;
 
+import java.util.List;
+
 @Dao
 public interface CountryDao {
     @Insert
@@ -26,4 +28,7 @@ public interface CountryDao {
 
     @Query("SELECT COUNT(*) FROM countries")
     LiveData<Integer> getCount();
+
+    @Query("SELECT * FROM countries")
+    LiveData<List<Country>> getAll();
 }

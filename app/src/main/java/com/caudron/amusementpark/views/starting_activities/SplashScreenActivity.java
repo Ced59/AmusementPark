@@ -1,10 +1,9 @@
-package com.caudron.amusementpark.views.splashscreen;
+package com.caudron.amusementpark.views.starting_activities;
 
 import static com.caudron.amusementpark.keys.ApiKeys.API_CAPTAIN_COASTER_KEY;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -242,7 +241,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 loadCoasters();
                                 break;
                             default:
-                                launchMainActivity();
+                                determineAndLaunchNextActivity();
                                 break;
                         }
                     }
@@ -255,11 +254,11 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
 
-    private void launchMainActivity() {
+    private void determineAndLaunchNextActivity() {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
+                Intent intent = new Intent(SplashScreenActivity.this, GeneralConfigActivity.class);
                 startActivity(intent);
                 finish();
             }

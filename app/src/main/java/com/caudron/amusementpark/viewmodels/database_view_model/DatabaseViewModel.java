@@ -206,4 +206,10 @@ public class DatabaseViewModel extends AndroidViewModel {
         StatusDao statusDao = db.statusDao();
         return statusDao.getCount();
     }
+
+    public LiveData<List<Country>> getCountries(Context context) {
+        AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
+        CountryDao countryDao = db.countryDao();
+        return countryDao.getAll();
+    }
 }
