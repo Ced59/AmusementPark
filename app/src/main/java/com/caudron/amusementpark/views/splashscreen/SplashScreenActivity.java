@@ -1,7 +1,5 @@
 package com.caudron.amusementpark.views.splashscreen;
 
-import static com.caudron.amusementpark.keys.ApiKeys.API_CAPTAIN_COASTER_KEY;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -10,7 +8,6 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +23,6 @@ import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModelFactory;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
 import com.caudron.amusementpark.views.MainActivity;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,7 +37,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     private ApiViewModel mApiViewModel;
     private DatabaseViewModel mDatabaseViewModel;
 
-    private final String mAuthToken = API_CAPTAIN_COASTER_KEY;
+    private final String mAuthToken = "a44c7304-5658-4434-b8ca-aa24d0c07845";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +52,8 @@ public class SplashScreenActivity extends AppCompatActivity {
         mApiViewModel = new ViewModelProvider(this, new ApiViewModelFactory(getApplication(), mAuthToken)).get(ApiViewModel.class);
         mDatabaseViewModel = new ViewModelProvider(this).get(DatabaseViewModel.class);
 
-        loadParks();
+        // Call API asynchronously
+        loadCoasters();
     }
 
 
@@ -67,14 +63,6 @@ public class SplashScreenActivity extends AppCompatActivity {
             @Override
             public void onChanged(CoastersResponseDto coasters) {
                 if (coasters != null && coasters.getCoasterDtos() != null) {
-                    mDatabaseViewModel.getCountCoasters(getApplicationContext()).observe(SplashScreenActivity.this, new Observer<Integer>() {
-                        @Override
-                        public void onChanged(Integer count) {
-                            if (count == coasters.getTotalItems()) {
-                                loadImageUrls();
-                            }
-                        }
-                    });
                     int nbPages = 1;
                     if (coasters.getViewDto() != null) {
                         nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
@@ -92,14 +80,6 @@ public class SplashScreenActivity extends AppCompatActivity {
         mApiViewModel.getImageUrls(mAuthToken, 1).observe(this, new Observer<ImagesResponseDto>() {
             @Override
             public void onChanged(ImagesResponseDto images) {
-                mDatabaseViewModel.getCountImages(getApplicationContext()).observe(SplashScreenActivity.this, new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer count) {
-                        if (count == images.getTotalItems()) {
-                            loadStatuses();
-                        }
-                    }
-                });
                 if (images != null && images.getImageDtos() != null) {
                     int nbPages = 1;
                     if (images.getViewDto() != null) {
@@ -120,14 +100,6 @@ public class SplashScreenActivity extends AppCompatActivity {
             @Override
             public void onChanged(ParksResponseDto parks) {
                 if (parks != null && parks.getParks() != null) {
-                    mDatabaseViewModel.getCountParks(getApplicationContext()).observe(SplashScreenActivity.this, new Observer<Integer>() {
-                        @Override
-                        public void onChanged(Integer count) {
-                            if (count == parks.getTotalItems()) {
-                                loadCoasters();
-                            }
-                        }
-                    });
                     int nbPages = 1;
                     if (parks.getViewDto() != null) {
                         nbPages = extractPageNumber(parks.getViewDto().getLastPage());
@@ -176,52 +148,21 @@ public class SplashScreenActivity extends AppCompatActivity {
                             CoastersResponseDto coasters = (CoastersResponseDto) data;
                             nbPages = getNbPages(coasters);
                             // Insert coasters into database
-                            ExecutorService executorServiceCoasters = Executors.newSingleThreadExecutor();
-                            executorServiceCoasters.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDatabaseViewModel.insertCoasters(coasters, getApplicationContext());
-                                }
-                            });
-                            executorServiceCoasters.shutdown();
+                            //mDatabaseViewModel.insertCoasters(coasters);
                             break;
                         case "ImagesResponseDto":
                             ImagesResponseDto images = (ImagesResponseDto) data;
                             nbPages = getNbPages(images);
                             // Insert images into database
-                            ExecutorService executorServiceImages = Executors.newSingleThreadExecutor();
-                            executorServiceImages.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDatabaseViewModel.insertImages(images, getApplicationContext());
-                                }
-                            });
-                            executorServiceImages.shutdown();
-
+                            //mDatabaseViewModel.insertImages(images);
                             break;
                         case "ParksResponseDto":
                             ParksResponseDto parks = (ParksResponseDto) data;
                             nbPages = getNbPages(parks);
-                            ExecutorService executorServiceParks = Executors.newSingleThreadExecutor();
-                            executorServiceParks.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDatabaseViewModel.insertParks(parks, getApplicationContext());
-                                }
-                            });
-                            executorServiceParks.shutdown();
                             break;
                         case "StatusesResponseDto":
                             StatusesResponseDto statuses = (StatusesResponseDto) data;
                             nbPages = getNbPages(statuses);
-                            ExecutorService executorServiceStatuses = Executors.newSingleThreadExecutor();
-                            executorServiceStatuses.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDatabaseViewModel.insertStatuses(statuses, getApplicationContext());
-                                }
-                            });
-                            executorServiceStatuses.shutdown();
                             break;
                         default:
                             break;
@@ -236,10 +177,10 @@ public class SplashScreenActivity extends AppCompatActivity {
                                 loadImageUrls();
                                 break;
                             case "ImagesResponseDto":
-                                loadStatuses();
+                                loadParks();
                                 break;
                             case "ParksResponseDto":
-                                loadCoasters();
+                                loadStatuses();
                                 break;
                             default:
                                 launchMainActivity();
@@ -256,14 +197,9 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
     private void launchMainActivity() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish();
-            }
-        }, 100); // 10000 ms = 10s
+        Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     private void showErrorToast() {
