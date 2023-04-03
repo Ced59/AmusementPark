@@ -37,8 +37,8 @@ public class GeneralConfigActivity extends AppCompatActivity {
                 listCountry = countries;
 
                 List<String> countryNames = new ArrayList<>();
-                countryNames.add("En fonction de votre géolocalisation");
-                countryNames.add("Monde entier");
+                countryNames.add(getString(R.string.geolocation_fonction));
+                countryNames.add(getString(R.string.all_world));
                 for (Country country : listCountry) {
                     countryNames.add(country.getName());
                 }

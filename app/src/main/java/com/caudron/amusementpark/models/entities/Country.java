@@ -12,7 +12,15 @@ public class Country {
     @PrimaryKey
     @NonNull
     private String name;
+    private String countryCode;
 
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
 
     public String getName() {
         return name;

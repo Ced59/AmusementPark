@@ -26,6 +26,7 @@ import com.caudron.amusementpark.models.entities.MaterialType;
 import com.caudron.amusementpark.models.entities.Park;
 import com.caudron.amusementpark.models.entities.SeatingType;
 import com.caudron.amusementpark.models.entities.Status;
+import com.caudron.amusementpark.utils.UtilsCountries;
 import com.caudron.amusementpark.utils.UtilsMapping;
 import com.caudron.amusementpark.utils.UtilsStrings;
 
@@ -137,10 +138,12 @@ public class DatabaseViewModel extends AndroidViewModel {
                     String nameCountryApi = country.getName();
                     String nameCountryFormatted = UtilsStrings.extractCountryName(nameCountryApi);
                     country.setName(nameCountryFormatted);
+                    UtilsCountries.fillCountryCode(country);
                     db.countryDao().insert(country);
                 } catch (SQLiteConstraintException e) {
                     Country existingCountry = db.countryDao().getCountryByName(country.getName());
                     if (existingCountry != null){
+                        UtilsCountries.fillCountryCode(country);
                         db.countryDao().update(country);
                     }
                 }

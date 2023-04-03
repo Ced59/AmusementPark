@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AmusementPark</string>
+    <string name="name_application">Amusement Park</string>
+    <string name="loading_progress">Lade Paket %1$d von %2$d</string>
+    <string name="loading_status">Status werden geladen…</string>
+    <string name="loading_parks">Parks werden geladen…</string>
+    <string name="loading_images">Bilder werden geladen…</string>
+    <string name="loading_coasters">Achterbahnen werden geladen…</string>
+    <string name="geolocation_fonction">Basierend auf Ihrem Standort</string>
+    <string name="all_world">Weltweit</string>
+</resources>

@@ -2,9 +2,9 @@
 <resources>
     <string name="app_name">AmusementPark</string>
     <string name="name_application">Amusement Park</string>
-    <string name="loading_progress">Chargement du lot n° %1$d sur %2$d</string>
-    <string name="loading_status">Chargement des statuts…</string>
-    <string name="loading_parks">Chargement des parcs…</string>
-    <string name="loading_images">Chargement des images…</string>
-    <string name="loading_coasters">Chargement des coasters…</string>
+    <string name="loading_progress">Loading lot %1$d of %2$d</string>
+    <string name="loading_status">Loading statuses…</string>
+    <string name="loading_parks">Loading parks…</string>
+    <string name="loading_images">Loading images…</string>
+    <string name="loading_coasters">Loading coasters…</string>
 </resources>
