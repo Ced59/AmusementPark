@@ -1,7 +1,12 @@
 package com.caudron.amusementpark.models.dtos;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ParkDto {
     private int id;
+
+    @SerializedName("@id")
+    private String idUri;
     private String name;
     private CountryDto country;
     private double latitude;
@@ -13,6 +18,14 @@ public class ParkDto {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getIdUri() {
+        return idUri;
+    }
+
+    public void setIdUri(String idUri) {
+        this.idUri = idUri;
     }
 
     public String getName() {

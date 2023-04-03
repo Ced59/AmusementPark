@@ -1,5 +1,6 @@
 package com.caudron.amusementpark.models.db.repositories.daos;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -24,5 +25,5 @@ public interface CountryDao {
 
 
     @Query("SELECT COUNT(*) FROM countries")
-    int getCount();
+    LiveData<Integer> getCount();
 }

@@ -1,5 +1,6 @@
 package com.caudron.amusementpark.models.db.repositories.daos;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -28,5 +29,5 @@ public interface StatusDao {
     Status getByName(String name);
 
     @Query("SELECT COUNT(*) FROM statuses")
-    int getCount();
+    LiveData<Integer> getCount();
 }

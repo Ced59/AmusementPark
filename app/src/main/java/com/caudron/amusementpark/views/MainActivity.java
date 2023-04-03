@@ -28,9 +28,9 @@ public class MainActivity extends AppCompatActivity {
                 final LiveData<Integer> countCoasters = mDatabaseViewModel.getCountCoasters(getApplicationContext());
                 final LiveData<Integer> countParks = mDatabaseViewModel.getCountParks(getApplicationContext());
                 final LiveData<Integer> countImages = mDatabaseViewModel.getCountImages(getApplicationContext());
-                final int countCountries = mDatabaseViewModel.getCountCountries(getApplicationContext());
-                final int countMaterialType = mDatabaseViewModel.getCountMaterialType(getApplicationContext());
-                final int countStatuses = mDatabaseViewModel.getCountStatuses(getApplicationContext());
+                final LiveData<Integer> countCountries = mDatabaseViewModel.getCountCountries(getApplicationContext());
+                final LiveData<Integer> countMaterialType = mDatabaseViewModel.getCountMaterialType(getApplicationContext());
+                final LiveData<Integer> countStatuses = mDatabaseViewModel.getCountStatuses(getApplicationContext());
 
                 runOnUiThread(new Runnable() {
                     @Override
@@ -59,14 +59,32 @@ public class MainActivity extends AppCompatActivity {
                             }
                         });
 
-                        TextView textViewCountCountries = findViewById(R.id.countries_count_textview);
-                        textViewCountCountries.setText("Nombre de pays dans la db : " + countCountries);
 
-                        TextView textViewCountMaterialType = findViewById(R.id.materialType_count_textview);
-                        textViewCountMaterialType.setText("Nombre de MaterialType dans la db : " + countMaterialType);
+                        countCountries.observe(MainActivity.this, new Observer<Integer>() {
+                            @Override
+                            public void onChanged(Integer count) {
+                                TextView textViewCountCountries = findViewById(R.id.countries_count_textview);
+                                textViewCountCountries.setText("Nombre de pays dans la db : " + count);
+                            }
+                        });
 
-                        TextView textViewCountStatuses = findViewById(R.id.statuses_count_textview);
-                        textViewCountStatuses.setText("Nombre de Status dans la db : " + countStatuses);
+
+                        countMaterialType.observe(MainActivity.this, new Observer<Integer>() {
+                            @Override
+                            public void onChanged(Integer count) {
+                                TextView textViewCountMaterialType = findViewById(R.id.materialType_count_textview);
+                                textViewCountMaterialType.setText("Nombre de MaterialType dans la db : " + count);
+                            }
+                        });
+
+                        countStatuses.observe(MainActivity.this, new Observer<Integer>() {
+                            @Override
+                            public void onChanged(Integer count) {
+                                TextView textViewCountStatuses = findViewById(R.id.statuses_count_textview);
+                                textViewCountStatuses.setText("Nombre de Status dans la db : " + count);
+                            }
+                        });
+
                     }
                 });
             }

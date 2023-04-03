@@ -60,7 +60,9 @@ public class DatabaseViewModel extends AndroidViewModel {
             }
             Park park = coaster.getPark();
             if (park != null){
-                coaster.setParkId(park.getId());
+                if(UtilsStrings.extractIdFromUri(park.getIdUri()) != null){
+                    coaster.setParkId(UtilsStrings.extractIdFromUri(park.getIdUri()));
+                }
             }
             Status status = coaster.getStatus();
             if (status != null){
@@ -73,7 +75,11 @@ public class DatabaseViewModel extends AndroidViewModel {
 
             Coaster existingCoaster = coasterDao.getById(coaster.getId());
             if (existingCoaster == null) {
-                coasterDao.insert(coaster);
+                try{
+                    coasterDao.insert(coaster);
+                } catch (SQLiteConstraintException e){
+                    coasterDao.update(coaster);
+                }
             } else {
                 coasterDao.update(coaster);
             }
@@ -98,7 +104,11 @@ public class DatabaseViewModel extends AndroidViewModel {
         for(Image image : images){
             Image existingImage = imageDao.getByPath(image.getPath());
             if (existingImage == null) {
-                imageDao.insert(image);
+                try{
+                    imageDao.insert(image);
+                } catch (SQLiteConstraintException e){
+                    imageDao.update(image);
+                }
             } else {
                 imageDao.update(image);
             }
@@ -148,7 +158,13 @@ public class DatabaseViewModel extends AndroidViewModel {
                 String nameStatusApi = status.getName();
                 String nameStatusFormatted = UtilsStrings.extractStatus(nameStatusApi);
                 status.setName(nameStatusFormatted);
-                statusDao.insert(status);
+
+                try{
+                    statusDao.insert(status);
+                } catch (SQLiteConstraintException e){
+                    statusDao.update(status);
+                }
+
             }else {
                 statusDao.update(status);
             }
@@ -173,19 +189,19 @@ public class DatabaseViewModel extends AndroidViewModel {
         return imageDao.getCount();
     }
 
-    public int getCountCountries(Context context){
+    public LiveData<Integer> getCountCountries(Context context){
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         CountryDao countryDao = db.countryDao();
         return  countryDao.getCount();
     }
 
-    public int getCountMaterialType(Context context) {
+    public LiveData<Integer> getCountMaterialType(Context context) {
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         MaterialTypeDao materialTypeDao = db.materialTypeDao();
         return materialTypeDao.getCount();
     }
 
-    public int getCountStatuses(Context context) {
+    public LiveData<Integer> getCountStatuses(Context context) {
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         StatusDao statusDao = db.statusDao();
         return statusDao.getCount();

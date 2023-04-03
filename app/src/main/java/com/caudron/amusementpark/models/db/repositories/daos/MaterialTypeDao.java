@@ -1,5 +1,6 @@
 package com.caudron.amusementpark.models.db.repositories.daos;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -33,7 +34,7 @@ public interface MaterialTypeDao {
     List<MaterialType> getAll();
 
     @Query("SELECT COUNT(*) FROM materialtypes")
-    int getCount();
+    LiveData<Integer> getCount();
 
 
 

@@ -12,6 +12,8 @@ public class Park {
     @PrimaryKey
     @NonNull
     private int id;
+    @Ignore
+    private String idUri;
     private String name;
     @ColumnInfo(name = "countryId")
     private String countryId;
@@ -66,5 +68,13 @@ public class Park {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getIdUri() {
+        return idUri;
+    }
+
+    public void setIdUri(String idUri) {
+        this.idUri = idUri;
     }
 }

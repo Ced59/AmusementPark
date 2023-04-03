@@ -28,13 +28,27 @@ public class UtilsStrings {
         }
         int firstDotIndex = input.indexOf('.');
         if (firstDotIndex == -1 || firstDotIndex == input.length() - 1) {
-            throw new IllegalArgumentException("Invalid input format: " + input);
+            return input.toLowerCase();
         }
         int secondDotIndex = input.indexOf('.', firstDotIndex + 1);
         if (secondDotIndex == -1) {
             return input.substring(firstDotIndex + 1);
         } else {
             return input.substring(firstDotIndex + 1, secondDotIndex);
+        }
+    }
+
+    public static Integer extractIdFromUri(String uri){
+        if (uri == null || uri.isEmpty()){
+            return null;
+        }
+        String[] splitPattern = uri.split("/");
+        String lastElement = splitPattern[splitPattern.length - 1];
+        try{
+            return Integer.parseInt(lastElement);
+        }
+        catch (NumberFormatException e){
+            return null;
         }
     }
 }
