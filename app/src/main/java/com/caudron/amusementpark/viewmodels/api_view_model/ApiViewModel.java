@@ -29,7 +29,7 @@ import retrofit2.Response;
 
 public class ApiViewModel extends AndroidViewModel {
 
-    private ApiService mApiService;
+    private final ApiService mApiService;
 
     public ApiViewModel(Application application, String token) {
         super(application);
@@ -40,7 +40,7 @@ public class ApiViewModel extends AndroidViewModel {
         MutableLiveData<CoastersResponseDto> data = new MutableLiveData<>();
         mApiService.getCoasters(authToken, page).enqueue(new Callback<CoastersResponseDto>() {
             @Override
-            public void onResponse(Call<CoastersResponseDto> call, Response<CoastersResponseDto> response) {
+            public void onResponse(@NonNull Call<CoastersResponseDto> call, @NonNull Response<CoastersResponseDto> response) {
                 if (response.isSuccessful()) {
                     data.setValue(response.body());
                 } else {
@@ -48,7 +48,7 @@ public class ApiViewModel extends AndroidViewModel {
                 }
             }
             @Override
-            public void onFailure(Call<CoastersResponseDto> call, Throwable t) {
+            public void onFailure(@NonNull Call<CoastersResponseDto> call, @NonNull Throwable t) {
                 data.setValue(null);
             }
         });
@@ -60,7 +60,7 @@ public class ApiViewModel extends AndroidViewModel {
 
         mApiService.getImages(authToken, page).enqueue(new Callback<ImagesResponseDto>() {
             @Override
-            public void onResponse(Call<ImagesResponseDto> call, Response<ImagesResponseDto> response) {
+            public void onResponse(@NonNull Call<ImagesResponseDto> call, @NonNull Response<ImagesResponseDto> response) {
                 if (response.isSuccessful()) {
                     data.setValue(response.body());
                 } else {
@@ -68,7 +68,7 @@ public class ApiViewModel extends AndroidViewModel {
                 }
             }
             @Override
-            public void onFailure(Call<ImagesResponseDto> call, Throwable t) {
+            public void onFailure(@NonNull Call<ImagesResponseDto> call, Throwable t) {
                 data.setValue(null);
             }
         });
@@ -81,7 +81,7 @@ public class ApiViewModel extends AndroidViewModel {
 
         mApiService.getParks(authToken, page).enqueue(new Callback<ParksResponseDto>() {
             @Override
-            public void onResponse(Call<ParksResponseDto> call, Response<ParksResponseDto> response) {
+            public void onResponse(@NonNull Call<ParksResponseDto> call, @NonNull Response<ParksResponseDto> response) {
                 if (response.isSuccessful()) {
                     data.setValue(response.body());
                 } else {
@@ -90,7 +90,7 @@ public class ApiViewModel extends AndroidViewModel {
             }
 
             @Override
-            public void onFailure(Call<ParksResponseDto> call, Throwable t) {
+            public void onFailure(@NonNull Call<ParksResponseDto> call, Throwable t) {
                 data.setValue(null);
             }
         });
@@ -103,7 +103,7 @@ public class ApiViewModel extends AndroidViewModel {
 
         mApiService.getStatuses(authToken, page).enqueue(new Callback<StatusesResponseDto>() {
             @Override
-            public void onResponse(Call<StatusesResponseDto> call, Response<StatusesResponseDto> response) {
+            public void onResponse(@NonNull Call<StatusesResponseDto> call, @NonNull Response<StatusesResponseDto> response) {
                 if (response.isSuccessful()) {
                     data.setValue(response.body());
                 } else {
@@ -112,7 +112,7 @@ public class ApiViewModel extends AndroidViewModel {
             }
 
             @Override
-            public void onFailure(Call<StatusesResponseDto> call, Throwable t) {
+            public void onFailure(@NonNull Call<StatusesResponseDto> call, @NonNull Throwable t) {
                 data.setValue(null);
             }
         });
