@@ -7,8 +7,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.PopupWindow;
 import android.widget.Spinner;
 
 import com.caudron.amusementpark.R;
@@ -24,6 +26,7 @@ public class GeneralConfigActivity extends AppCompatActivity {
     private List<Country> listCountry;
     private DatabaseViewModel dbViewModel;
     private Spinner countrySpinner;
+    private boolean isActivityDestroyed = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +39,10 @@ public class GeneralConfigActivity extends AppCompatActivity {
         dbViewModel.getCountries(this).observe(GeneralConfigActivity.this, new Observer<List<Country>>() {
             @Override
             public void onChanged(List<Country> countries) {
+                if (isActivityDestroyed) {
+                    return;
+                }
+
                 listCountry = countries;
 
                 List<String> countryCodes = new ArrayList<>();
@@ -63,4 +70,11 @@ public class GeneralConfigActivity extends AppCompatActivity {
             }
         });
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isActivityDestroyed = true;
+    }
+
 }
