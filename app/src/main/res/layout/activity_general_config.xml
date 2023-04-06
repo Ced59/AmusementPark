@@ -10,7 +10,7 @@
         android:id="@+id/country_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Selectionnez un pays"
+        android:text="@string/select_country_config"
         android:textColor="@color/white"
         android:textSize="18sp"/>
 
@@ -23,29 +23,11 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"/>
 
-    <TextView
-        android:id="@+id/language_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Selectionnez une langue"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:layout_marginTop="8dp"/>
-
-    <Spinner
-        android:id="@+id/language_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        android:spinnerMode="dropdown"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"/>
-
     <Button
         android:id="@+id/save_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Valider"
+        android:text="@string/validate"
         android:textColor="@color/white"
         android:background="@color/dark_blue"
         android:layout_gravity="end"

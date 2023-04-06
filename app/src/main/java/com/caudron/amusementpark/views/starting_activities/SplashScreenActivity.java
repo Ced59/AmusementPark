@@ -25,8 +25,12 @@ import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModelFactory;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
 import com.caudron.amusementpark.views.MainActivity;
 
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +46,15 @@ public class SplashScreenActivity extends AppCompatActivity {
     private DatabaseViewModel mDatabaseViewModel;
 
     private final String mAuthToken = API_CAPTAIN_COASTER_KEY;
+
+    private final int MAX_ACTIVE_THREADS = 10;
+
+    private BlockingQueue<Runnable> mTaskQueue = new LinkedBlockingQueue<>();
+
+    private ExecutorService mTaskExecutor = new ThreadPoolExecutor(
+            MAX_ACTIVE_THREADS, MAX_ACTIVE_THREADS,
+            0L, TimeUnit.MILLISECONDS,
+            mTaskQueue);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,14 +84,16 @@ public class SplashScreenActivity extends AppCompatActivity {
                         public void onChanged(Integer count) {
                             if (count == coasters.getTotalItems()) {
                                 loadImageUrls();
+                            } else {
+                                int nbPages = 1;
+                                if (coasters.getViewDto() != null) {
+                                    nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
+                                }
+                                loadDataRecursive(1, nbPages, mApiViewModel::getCoasters, mAuthToken);
                             }
                         }
                     });
-                    int nbPages = 1;
-                    if (coasters.getViewDto() != null) {
-                        nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
-                    }
-                    loadDataRecursive(1, nbPages, mApiViewModel::getCoasters, mAuthToken);
+
                 } else {
                     showErrorToast();
                 }
@@ -96,18 +111,20 @@ public class SplashScreenActivity extends AppCompatActivity {
                     public void onChanged(Integer count) {
                         if (count == images.getTotalItems()) {
                             loadStatuses();
+                        } else {
+                            if (images != null && images.getImageDtos() != null) {
+                                int nbPages = 1;
+                                if (images.getViewDto() != null) {
+                                    nbPages = extractPageNumber(images.getViewDto().getLastPage());
+                                }
+                                loadDataRecursive(1, nbPages, mApiViewModel::getImageUrls, mAuthToken);
+                            } else {
+                                showErrorToast();
+                            }
                         }
                     }
                 });
-                if (images != null && images.getImageDtos() != null) {
-                    int nbPages = 1;
-                    if (images.getViewDto() != null) {
-                        nbPages = extractPageNumber(images.getViewDto().getLastPage());
-                    }
-                    loadDataRecursive(1, nbPages, mApiViewModel::getImageUrls, mAuthToken);
-                } else {
-                    showErrorToast();
-                }
+
             }
         });
     }
@@ -124,14 +141,16 @@ public class SplashScreenActivity extends AppCompatActivity {
                         public void onChanged(Integer count) {
                             if (count == parks.getTotalItems()) {
                                 loadCoasters();
+                            } else {
+                                int nbPages = 1;
+                                if (parks.getViewDto() != null) {
+                                    nbPages = extractPageNumber(parks.getViewDto().getLastPage());
+                                }
+                                loadDataRecursive(1, nbPages, mApiViewModel::getParks, mAuthToken);
                             }
                         }
                     });
-                    int nbPages = 1;
-                    if (parks.getViewDto() != null) {
-                        nbPages = extractPageNumber(parks.getViewDto().getLastPage());
-                    }
-                    loadDataRecursive(1, nbPages, mApiViewModel::getParks, mAuthToken);
+
                 } else {
                     showErrorToast();
                 }
@@ -175,52 +194,44 @@ public class SplashScreenActivity extends AppCompatActivity {
                             CoastersResponseDto coasters = (CoastersResponseDto) data;
                             nbPages = getNbPages(coasters);
                             // Insert coasters into database
-                            ExecutorService executorServiceCoasters = Executors.newSingleThreadExecutor();
-                            executorServiceCoasters.execute(new Runnable() {
+                            mTaskExecutor.execute(new Runnable() {
                                 @Override
                                 public void run() {
                                     mDatabaseViewModel.insertCoasters(coasters, getApplicationContext());
                                 }
                             });
-                            executorServiceCoasters.shutdown();
                             break;
                         case "ImagesResponseDto":
                             ImagesResponseDto images = (ImagesResponseDto) data;
                             nbPages = getNbPages(images);
                             // Insert images into database
-                            ExecutorService executorServiceImages = Executors.newSingleThreadExecutor();
-                            executorServiceImages.execute(new Runnable() {
+                            mTaskExecutor.execute(new Runnable() {
                                 @Override
                                 public void run() {
                                     mDatabaseViewModel.insertImages(images, getApplicationContext());
                                 }
                             });
-                            executorServiceImages.shutdown();
 
                             break;
                         case "ParksResponseDto":
                             ParksResponseDto parks = (ParksResponseDto) data;
                             nbPages = getNbPages(parks);
-                            ExecutorService executorServiceParks = Executors.newSingleThreadExecutor();
-                            executorServiceParks.execute(new Runnable() {
+                            mTaskExecutor.execute(new Runnable() {
                                 @Override
                                 public void run() {
                                     mDatabaseViewModel.insertParks(parks, getApplicationContext());
                                 }
                             });
-                            executorServiceParks.shutdown();
                             break;
                         case "StatusesResponseDto":
                             StatusesResponseDto statuses = (StatusesResponseDto) data;
                             nbPages = getNbPages(statuses);
-                            ExecutorService executorServiceStatuses = Executors.newSingleThreadExecutor();
-                            executorServiceStatuses.execute(new Runnable() {
+                            mTaskExecutor.execute(new Runnable() {
                                 @Override
                                 public void run() {
                                     mDatabaseViewModel.insertStatuses(statuses, getApplicationContext());
                                 }
                             });
-                            executorServiceStatuses.shutdown();
                             break;
                         default:
                             break;
@@ -286,6 +297,14 @@ public class SplashScreenActivity extends AppCompatActivity {
         }
         else {
             return 1;
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mTaskExecutor != null) {
+            mTaskExecutor.shutdownNow();
         }
     }
 }

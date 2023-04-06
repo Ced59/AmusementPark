@@ -7,4 +7,6 @@
     <string name="loading_parks">Loading parks…</string>
     <string name="loading_images">Loading images…</string>
     <string name="loading_coasters">Loading coasters…</string>
+    <string name="geolocation_fonction">Based on your geolocation</string>
+    <string name="all_world">Whole world</string>
 </resources>

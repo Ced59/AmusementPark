@@ -48,7 +48,7 @@
     <string name="country_cd">Congo (République démocratique du)</string>
     <string name="country_kp">Corée du Nord</string>
     <string name="country_cr">Costa Rica</string>
-    <string name="country_ci">Côte d'Ivoire</string>
+    <string name="country_ci">Côte dIvoire</string>
     <string name="country_hr">Croatie</string>
     <string name="country_cu">Cuba</string>
     <string name="country_cw">Curaçao</string>
@@ -208,4 +208,12 @@
     <string name="country_ye">Yémen</string>
     <string name="country_zm">Zambie</string>
     <string name="country_zw">Zimbabwe</string>
+    <string name="country_us">Etats-Unis d\'Amérique</string>
+    <string name="country_sb">Îles Salomon</string>
+    <string name="country_pm">Saint Pierre et Miquelon</string>
+    <string name="country_io">Territoire britannique de l\'océan Indien</string>
+    <string name="country_mv">Maldives</string>
+    <string name="country_ml">Mali</string>
+    <string name="country_mt">Malte</string>
+    <string name="country_za">Afrique du sud</string>
 </resources>

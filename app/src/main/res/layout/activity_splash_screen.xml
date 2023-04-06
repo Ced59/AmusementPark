@@ -35,7 +35,7 @@
             android:id="@+id/slogan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tous les parcs d'attractions dans votre poche"
+            android:text="@string/slogan"
             android:textSize="16sp"
             android:textColor="@android:color/white"
             android:layout_gravity="center_horizontal"

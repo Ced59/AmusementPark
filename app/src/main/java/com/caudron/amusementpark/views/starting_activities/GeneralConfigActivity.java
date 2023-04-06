@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -36,11 +37,24 @@ public class GeneralConfigActivity extends AppCompatActivity {
             public void onChanged(List<Country> countries) {
                 listCountry = countries;
 
+                List<String> countryCodes = new ArrayList<>();
+                for (Country country : listCountry) {
+                    countryCodes.add(country.getCountryCode());
+                }
                 List<String> countryNames = new ArrayList<>();
                 countryNames.add(getString(R.string.geolocation_fonction));
                 countryNames.add(getString(R.string.all_world));
-                for (Country country : listCountry) {
-                    countryNames.add(country.getName());
+
+                for (String code : countryCodes) {
+                    String nameResource = "country_" + code.toLowerCase();
+
+                    try {
+                        int resourceId = getResources().getIdentifier(nameResource, "string", getPackageName());
+                        String resourceValue = getString(resourceId);
+                        countryNames.add(resourceValue);
+                    } catch (Resources.NotFoundException ignored) {
+
+                    }
                 }
 
                 ArrayAdapter<String> countryAdapter = new ArrayAdapter<>(GeneralConfigActivity.this, android.R.layout.simple_spinner_dropdown_item, countryNames);

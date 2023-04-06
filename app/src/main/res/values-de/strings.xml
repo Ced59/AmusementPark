@@ -9,4 +9,7 @@
     <string name="loading_coasters">Achterbahnen werden geladen…</string>
     <string name="geolocation_fonction">Basierend auf Ihrem Standort</string>
     <string name="all_world">Weltweit</string>
+    <string name="select_country_config">Wählen Sie den Anzeigebereich der Karte auf der Hauptseite aus</string>
+    <string name="validate">Bestätigen</string>
+    <string name="slogan">Alle Vergnügungsparks in Ihrer Tasche</string>
 </resources>
