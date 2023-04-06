@@ -12,4 +12,7 @@
     <string name="select_country_config">Wählen Sie den Anzeigebereich der Karte auf der Hauptseite aus</string>
     <string name="validate">Bestätigen</string>
     <string name="slogan">Alle Vergnügungsparks in Ihrer Tasche</string>
+    <string name="error_loading">Beim Laden der Daten ist ein Fehler aufgetreten</string>
+    <string name="maj_datas">Daten werden aktualisiert…</string>
+    <string name="country_flag">Landesflagge</string>
 </resources>

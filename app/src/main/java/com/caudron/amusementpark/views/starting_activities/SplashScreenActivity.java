@@ -181,7 +181,7 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
     private void showErrorToast() {
-        Toast.makeText(SplashScreenActivity.this, "Une erreur s'est produite lors du chargement des données.", Toast.LENGTH_LONG).show();
+        Toast.makeText(SplashScreenActivity.this, R.string.error_loading, Toast.LENGTH_LONG).show();
     }
 
     private int extractPageNumber(String lastPage) {

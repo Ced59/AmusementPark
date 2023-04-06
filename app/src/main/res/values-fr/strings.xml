@@ -12,4 +12,7 @@
     <string name="select_country_config">Selectionnez la zone d\'affichage de la carte de la page principale</string>
     <string name="validate">Valider</string>
     <string name="slogan">Tous les parcs d\'attractions dans votre poche</string>
+    <string name="error_loading">Une erreur s\'est produite lors du chargement des données.</string>
+    <string name="maj_datas">Mise à jour des données en cours…</string>
+    <string name="country_flag">Drapeau du pays</string>
 </resources>

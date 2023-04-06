@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import com.caudron.amusementpark.R;
 import com.caudron.amusementpark.models.entities.Country;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
+import com.caudron.amusementpark.views.adapters.CountrySpinnerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,9 +58,7 @@ public class GeneralConfigActivity extends AppCompatActivity {
                     }
                 }
 
-                ArrayAdapter<String> countryAdapter = new ArrayAdapter<>(GeneralConfigActivity.this, android.R.layout.simple_spinner_dropdown_item, countryNames);
-                countryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
+                ArrayAdapter<String> countryAdapter = new CountrySpinnerAdapter(GeneralConfigActivity.this, countryNames, countryCodes);
                 countrySpinner.setAdapter(countryAdapter);
             }
         });

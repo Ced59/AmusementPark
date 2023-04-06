@@ -12,4 +12,7 @@
     <string name="select_country_config">Select display area of the map on the main page</string>
     <string name="validate">Validate</string>
     <string name="slogan">All the amusement parks in your pocket</string>
+    <string name="error_loading">An error occurred while loading the data</string>
+    <string name="maj_datas">Updating data…</string>
+    <string name="country_flag">Country flag</string>
 </resources>
