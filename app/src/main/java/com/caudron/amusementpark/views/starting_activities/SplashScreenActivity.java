@@ -4,6 +4,7 @@ import static com.caudron.amusementpark.keys.ApiKeys.API_CAPTAIN_COASTER_KEY;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -16,21 +17,28 @@ import android.widget.Toast;
 
 import com.caudron.amusementpark.R;
 import com.caudron.amusementpark.models.dtos.BaseResponseDto;
+import com.caudron.amusementpark.models.dtos.CoasterDto;
 import com.caudron.amusementpark.models.dtos.CoastersResponseDto;
+import com.caudron.amusementpark.models.dtos.ImageDto;
 import com.caudron.amusementpark.models.dtos.ImagesResponseDto;
+import com.caudron.amusementpark.models.dtos.ParkDto;
 import com.caudron.amusementpark.models.dtos.ParksResponseDto;
+import com.caudron.amusementpark.models.dtos.StatusDto;
 import com.caudron.amusementpark.models.dtos.StatusesResponseDto;
 import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModel;
 import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModelFactory;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
 import com.caudron.amusementpark.views.MainActivity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,14 +55,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private final String mAuthToken = API_CAPTAIN_COASTER_KEY;
 
-    private final int MAX_ACTIVE_THREADS = 10;
-
-    private BlockingQueue<Runnable> mTaskQueue = new LinkedBlockingQueue<>();
-
-    private ExecutorService mTaskExecutor = new ThreadPoolExecutor(
-            MAX_ACTIVE_THREADS, MAX_ACTIVE_THREADS,
-            0L, TimeUnit.MILLISECONDS,
-            mTaskQueue);
+    private final ExecutorService mTaskExecutor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,196 +66,103 @@ public class SplashScreenActivity extends AppCompatActivity {
         mBackgroundTaskInfoType = findViewById(R.id.backgroundTaskInfoType);
         mBackgroundTaskInfoProgress = findViewById(R.id.backgroundTaskInfoProgress);
 
-
         mApiViewModel = new ViewModelProvider(this, new ApiViewModelFactory(getApplication(), mAuthToken)).get(ApiViewModel.class);
         mDatabaseViewModel = new ViewModelProvider(this).get(DatabaseViewModel.class);
 
         loadParks();
     }
 
+    private void loadParks() {
+        mBackgroundTaskInfoType.setText(R.string.loading_parks);
+
+        getApiTotalItems(mApiViewModel::getParks, totalItems -> {
+            mDatabaseViewModel.getCountParks(getApplicationContext()).observe(this, count -> {
+                if (count != null && count.equals(totalItems)){
+                    loadCoasters();
+                } else{
+                    loadDataFromApi(mApiViewModel::getParks, data -> {
+                        mTaskExecutor.execute(() -> {
+                            mDatabaseViewModel.insertParks((ParksResponseDto) data, getApplicationContext());
+                            runOnUiThread(this::loadCoasters);
+                        });
+                    }, ParksResponseDto.class);
+                }
+            });
+        });
+    }
 
     private void loadCoasters() {
         mBackgroundTaskInfoType.setText(R.string.loading_coasters);
-        mApiViewModel.getCoasters(mAuthToken, 1).observe(this, new Observer<CoastersResponseDto>() {
-            @Override
-            public void onChanged(CoastersResponseDto coasters) {
-                if (coasters != null && coasters.getCoasterDtos() != null) {
-                    mDatabaseViewModel.getCountCoasters(getApplicationContext()).observe(SplashScreenActivity.this, new Observer<Integer>() {
-                        @Override
-                        public void onChanged(Integer count) {
-                            if (count == coasters.getTotalItems()) {
-                                loadImageUrls();
-                            } else {
-                                int nbPages = 1;
-                                if (coasters.getViewDto() != null) {
-                                    nbPages = extractPageNumber(coasters.getViewDto().getLastPage());
-                                }
-                                loadDataRecursive(1, nbPages, mApiViewModel::getCoasters, mAuthToken);
-                            }
-                        }
-                    });
-
-                } else {
-                    showErrorToast();
+        getApiTotalItems(mApiViewModel::getCoasters, totalItems -> {
+            mDatabaseViewModel.getCountCoasters(getApplicationContext()).observe(this, count -> {
+                if (count != null && count.equals(totalItems)){
+                    loadImageUrls();
+                } else{
+                    loadDataFromApi(mApiViewModel::getCoasters, data -> {
+                        mTaskExecutor.execute(() -> {
+                            mDatabaseViewModel.insertCoasters((CoastersResponseDto) data, getApplicationContext());
+                            runOnUiThread(this::loadImageUrls);
+                        });
+                    }, CoastersResponseDto.class);
                 }
-            }
+            });
         });
     }
 
     private void loadImageUrls() {
         mBackgroundTaskInfoType.setText(R.string.loading_images);
-        mApiViewModel.getImageUrls(mAuthToken, 1).observe(this, new Observer<ImagesResponseDto>() {
-            @Override
-            public void onChanged(ImagesResponseDto images) {
-                mDatabaseViewModel.getCountImages(getApplicationContext()).observe(SplashScreenActivity.this, new Observer<Integer>() {
-                    @Override
-                    public void onChanged(Integer count) {
-                        if (count == images.getTotalItems()) {
-                            loadStatuses();
-                        } else {
-                            if (images != null && images.getImageDtos() != null) {
-                                int nbPages = 1;
-                                if (images.getViewDto() != null) {
-                                    nbPages = extractPageNumber(images.getViewDto().getLastPage());
-                                }
-                                loadDataRecursive(1, nbPages, mApiViewModel::getImageUrls, mAuthToken);
-                            } else {
-                                showErrorToast();
-                            }
-                        }
-                    }
-                });
-
-            }
-        });
-    }
-
-
-    private void loadParks() {
-        mBackgroundTaskInfoType.setText(R.string.loading_parks);
-        mApiViewModel.getParks(mAuthToken, 1).observe(this, new Observer<ParksResponseDto>() {
-            @Override
-            public void onChanged(ParksResponseDto parks) {
-                if (parks != null && parks.getParks() != null) {
-                    mDatabaseViewModel.getCountParks(getApplicationContext()).observe(SplashScreenActivity.this, new Observer<Integer>() {
-                        @Override
-                        public void onChanged(Integer count) {
-                            if (count == parks.getTotalItems()) {
-                                loadCoasters();
-                            } else {
-                                int nbPages = 1;
-                                if (parks.getViewDto() != null) {
-                                    nbPages = extractPageNumber(parks.getViewDto().getLastPage());
-                                }
-                                loadDataRecursive(1, nbPages, mApiViewModel::getParks, mAuthToken);
-                            }
-                        }
-                    });
-
-                } else {
-                    showErrorToast();
+        getApiTotalItems(mApiViewModel::getImageUrls, totalItems -> {
+            mDatabaseViewModel.getCountImages(getApplicationContext()).observe(this, count -> {
+                if (count != null && count.equals(totalItems)){
+                    loadStatuses();
+                }else{
+                    loadDataFromApi(mApiViewModel::getImageUrls, data -> {
+                        mTaskExecutor.execute(() -> {
+                            mDatabaseViewModel.insertImages((ImagesResponseDto) data, getApplicationContext());
+                            runOnUiThread(this::loadStatuses);
+                        });
+                    }, ImagesResponseDto.class);
                 }
-            }
+            });
         });
     }
 
     private void loadStatuses() {
         mBackgroundTaskInfoType.setText(R.string.loading_status);
-        mApiViewModel.getStatuses(mAuthToken, 1).observe(this, new Observer<StatusesResponseDto>() {
-            @Override
-            public void onChanged(StatusesResponseDto statuses) {
-                if (statuses != null && statuses.getStatuses() != null) {
-                    int nbPages = 1;
-                    if (statuses.getViewDto() != null){
-                        nbPages = extractPageNumber(statuses.getViewDto().getLastPage());
-                    }
-                    loadDataRecursive(1, nbPages, mApiViewModel::getStatuses, mAuthToken);
+        getApiTotalItems(mApiViewModel::getStatuses, totalItems -> {
+            mDatabaseViewModel.getCountStatuses(getApplicationContext()).observe(this, count -> {
+                if (count != null && count.equals(totalItems)){
+                    determineAndLaunchNextActivity();
                 } else {
-                    showErrorToast();
+                    loadDataFromApi(mApiViewModel::getStatuses, data -> {
+                        mTaskExecutor.execute(() -> {
+                            mDatabaseViewModel.insertStatuses((StatusesResponseDto) data, getApplicationContext());
+                            runOnUiThread(this::determineAndLaunchNextActivity);
+                        });
+                    }, StatusesResponseDto.class);
                 }
-            }
+            });
         });
     }
 
 
-    private <T> void loadDataRecursive(final int currentPage, int nbPages, Function2<String, Integer, LiveData<T>> apiCall, String authToken) {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                mBackgroundTaskInfoProgress.setText(getString(R.string.loading_progress, currentPage, nbPages));
-            }
-        });
-        apiCall.invoke(authToken, currentPage).observe(this, new Observer<T>() {
+    private <T extends BaseResponseDto> void loadDataFromApi(Function2<String, Integer, LiveData<T>> apiCall, Consumer<T> onComplete, Class<T> clazz) {
+        List<T> dataList = new ArrayList<>();
+        loadPage(apiCall, 1, dataList, onComplete, clazz);
+    }
+
+    private <T extends BaseResponseDto> void loadPage(Function2<String, Integer, LiveData<T>> apiCall, int page, List<T> dataList, Consumer<T> onComplete, Class<T> clazz) {
+        apiCall.invoke(mAuthToken, page).observe(this, new Observer<T>() {
             @Override
             public void onChanged(T data) {
                 if (data != null) {
-                    int nbPages = 1;
-                    switch (data.getClass().getSimpleName()) {
-                        case "CoastersResponseDto":
-                            CoastersResponseDto coasters = (CoastersResponseDto) data;
-                            nbPages = getNbPages(coasters);
-                            // Insert coasters into database
-                            mTaskExecutor.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDatabaseViewModel.insertCoasters(coasters, getApplicationContext());
-                                }
-                            });
-                            break;
-                        case "ImagesResponseDto":
-                            ImagesResponseDto images = (ImagesResponseDto) data;
-                            nbPages = getNbPages(images);
-                            // Insert images into database
-                            mTaskExecutor.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDatabaseViewModel.insertImages(images, getApplicationContext());
-                                }
-                            });
-
-                            break;
-                        case "ParksResponseDto":
-                            ParksResponseDto parks = (ParksResponseDto) data;
-                            nbPages = getNbPages(parks);
-                            mTaskExecutor.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDatabaseViewModel.insertParks(parks, getApplicationContext());
-                                }
-                            });
-                            break;
-                        case "StatusesResponseDto":
-                            StatusesResponseDto statuses = (StatusesResponseDto) data;
-                            nbPages = getNbPages(statuses);
-                            mTaskExecutor.execute(new Runnable() {
-                                @Override
-                                public void run() {
-                                    mDatabaseViewModel.insertStatuses(statuses, getApplicationContext());
-                                }
-                            });
-                            break;
-                        default:
-                            break;
-                    }
-
-                    if (currentPage < nbPages) {
-                        // Load next page recursively
-                        loadDataRecursive(currentPage + 1, nbPages, apiCall, authToken);
+                    dataList.add(data);
+                    int totalPages = getNbPages((BaseResponseDto) data);
+                    if (page < totalPages) {
+                        loadPage(apiCall, page + 1, dataList, onComplete, clazz);
                     } else {
-                        switch (data.getClass().getSimpleName()) {
-                            case "CoastersResponseDto":
-                                loadImageUrls();
-                                break;
-                            case "ImagesResponseDto":
-                                loadStatuses();
-                                break;
-                            case "ParksResponseDto":
-                                loadCoasters();
-                                break;
-                            default:
-                                determineAndLaunchNextActivity();
-                                break;
-                        }
+                        T combinedData = mergeData(dataList, clazz);
+                        onComplete.accept(combinedData);
                     }
                 } else {
                     showErrorToast();
@@ -264,15 +172,11 @@ public class SplashScreenActivity extends AppCompatActivity {
     }
 
 
-
     private void determineAndLaunchNextActivity() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Intent intent = new Intent(SplashScreenActivity.this, GeneralConfigActivity.class);
-                startActivity(intent);
-                finish();
-            }
+        new Handler().postDelayed(() -> {
+            Intent intent = new Intent(SplashScreenActivity.this, GeneralConfigActivity.class);
+            startActivity(intent);
+            finish();
         }, 100); // 10000 ms = 10s
     }
 
@@ -300,11 +204,58 @@ public class SplashScreenActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (mTaskExecutor != null) {
-            mTaskExecutor.shutdownNow();
+    private <T extends BaseResponseDto> T mergeData(List<T> dataList, Class<T> clazz) {
+        if (dataList == null || dataList.isEmpty()) {
+            return null;
         }
+
+        T mergedData;
+        try {
+            mergedData = clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+
+        List<Object> mergedList = new ArrayList<>();
+
+        for (T data : dataList) {
+            if (data instanceof CoastersResponseDto) {
+                mergedList.addAll(((CoastersResponseDto) data).getCoasterDtos());
+            } else if (data instanceof ImagesResponseDto) {
+                mergedList.addAll(((ImagesResponseDto) data).getImageDtos());
+            } else if (data instanceof ParksResponseDto) {
+                mergedList.addAll(((ParksResponseDto) data).getParks());
+            } else if (data instanceof StatusesResponseDto) {
+                mergedList.addAll(((StatusesResponseDto) data).getStatuses());
+            }
+        }
+
+        if (mergedData instanceof CoastersResponseDto) {
+            ((CoastersResponseDto) mergedData).setCoasterDtos((List<CoasterDto>) (List<?>) mergedList);
+        } else if (mergedData instanceof ImagesResponseDto) {
+            ((ImagesResponseDto) mergedData).setImageDtos((List<ImageDto>) (List<?>) mergedList);
+        } else if (mergedData instanceof ParksResponseDto) {
+            ((ParksResponseDto) mergedData).setParks((List<ParkDto>) (List<?>) mergedList);
+        } else if (mergedData instanceof StatusesResponseDto) {
+            ((StatusesResponseDto) mergedData).setStatuses((List<StatusDto>) (List<?>) mergedList);
+        }
+
+        return mergedData;
     }
+
+    private <T extends BaseResponseDto> void getApiTotalItems(Function2<String, Integer, LiveData<T>> apiCall, Consumer<Integer> onComplete) {
+        apiCall.invoke(mAuthToken, 1).observe(this, new Observer<T>() {
+            @Override
+            public void onChanged(T data) {
+                if (data != null) {
+                    onComplete.accept(data.getTotalItems());
+                } else {
+                    showErrorToast();
+                }
+            }
+        });
+    }
+
 }
+
