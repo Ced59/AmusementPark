@@ -186,7 +186,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
             finish();
-        }, 1000); // 10000 ms = 10s
+        }, 1000);
     }
 
     private void showErrorToast() {
