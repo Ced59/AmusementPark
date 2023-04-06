@@ -14,14 +14,14 @@ public class UtilsSharedPreferences {
         return activity.getSharedPreferences(nameFile, Context.MODE_PRIVATE);
     }
 
-    public static <T> void saveSharedPreferences(SharedPreferences preferences, String name, ArrayList<T> datas){
+    public static <T> void saveSharedPreferencesList(SharedPreferences preferences, String name, ArrayList<T> datas){
         Editor editor = preferences.edit();
         String dataJson = UtilsJson.serializeObject(datas);
         editor.putString(name, dataJson);
         editor.apply();
     }
 
-    public static <T> List<T> getSharedPreferences(SharedPreferences preferences ,String name){
+    public static <T> List<T> getSharedPreferencesList(SharedPreferences preferences ,String name){
         String jsonDatas = preferences.getString(name, null);
         ArrayList<T> datas = UtilsJson.deserializeListObject(jsonDatas);
 
@@ -29,6 +29,21 @@ public class UtilsSharedPreferences {
             datas = new ArrayList<>();
         }
         return datas;
+    }
+
+    public static <T> void saveSharedPreferences(SharedPreferences preferences, String name, T data){
+        Editor editor = preferences.edit();
+        String dataJson = UtilsJson.serializeObject(data);
+        editor.putString(name, dataJson);
+        editor.apply();
+    }
+
+    public static <T> T getSharedPreferences(SharedPreferences preferences ,String name, Class<T> clazz){
+        String jsonData = preferences.getString(name, null);
+        if(jsonData != null){
+            return UtilsJson.deserializeObject(jsonData, clazz);
+        }
+        return null;
     }
 
 }

@@ -17,4 +17,10 @@ public class UtilsJson {
         Type type = new TypeToken<T>() {}.getType();
         return gson.fromJson(json, type);
     }
+
+    public static <T> T deserializeObject(String json, Class<T> clazz){
+        Gson gson = new Gson();
+        return gson.fromJson(json, clazz);
+    }
+
 }

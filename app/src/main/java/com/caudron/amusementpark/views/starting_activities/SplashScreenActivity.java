@@ -9,8 +9,10 @@ import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,6 +27,7 @@ import com.caudron.amusementpark.models.dtos.ParkDto;
 import com.caudron.amusementpark.models.dtos.ParksResponseDto;
 import com.caudron.amusementpark.models.dtos.StatusDto;
 import com.caudron.amusementpark.models.dtos.StatusesResponseDto;
+import com.caudron.amusementpark.utils.UtilsSharedPreferences;
 import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModel;
 import com.caudron.amusementpark.viewmodels.api_view_model.ApiViewModelFactory;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
@@ -174,10 +177,16 @@ public class SplashScreenActivity extends AppCompatActivity {
 
     private void determineAndLaunchNextActivity() {
         new Handler().postDelayed(() -> {
-            Intent intent = new Intent(SplashScreenActivity.this, GeneralConfigActivity.class);
-            startActivity(intent);
+            SharedPreferences preferences = UtilsSharedPreferences.getSharedPreferencesFile(this, "GeneralConfig");
+            if (preferences.contains("GeneralConfig")) {
+                Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(SplashScreenActivity.this, GeneralConfigActivity.class);
+                startActivity(intent);
+            }
             finish();
-        }, 100); // 10000 ms = 10s
+        }, 1000); // 10000 ms = 10s
     }
 
     private void showErrorToast() {

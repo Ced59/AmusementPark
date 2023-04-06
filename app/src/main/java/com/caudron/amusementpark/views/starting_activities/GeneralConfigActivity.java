@@ -1,20 +1,21 @@
 package com.caudron.amusementpark.views.starting_activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.ViewGroup;
+import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.PopupWindow;
+import android.widget.Button;
 import android.widget.Spinner;
 
 import com.caudron.amusementpark.R;
 import com.caudron.amusementpark.models.entities.Country;
+import com.caudron.amusementpark.models.entities.general_preferences.GeneralConfig;
+import com.caudron.amusementpark.utils.UtilsSharedPreferences;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
 import com.caudron.amusementpark.views.adapters.CountrySpinnerAdapter;
 
@@ -35,6 +36,14 @@ public class GeneralConfigActivity extends AppCompatActivity {
 
         dbViewModel = new ViewModelProvider(this).get(DatabaseViewModel.class);
         countrySpinner = findViewById(R.id.country_spinner);
+
+        Button saveButton = findViewById(R.id.save_button);
+        saveButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveSelectedCountryCode();
+            }
+        });
 
         dbViewModel.getCountries(this).observe(GeneralConfigActivity.this, new Observer<List<Country>>() {
             @Override
@@ -76,5 +85,25 @@ public class GeneralConfigActivity extends AppCompatActivity {
         super.onDestroy();
         isActivityDestroyed = true;
     }
+
+    private void saveSelectedCountryCode() {
+        int selectedPosition = countrySpinner.getSelectedItemPosition();
+        String selectedCountryCode;
+
+        if (selectedPosition == 0) {
+            selectedCountryCode = "geoloc";
+        } else if (selectedPosition == 1) {
+            selectedCountryCode = "world";
+        } else {
+            selectedCountryCode = listCountry.get(selectedPosition - 2).getCountryCode();
+        }
+
+        GeneralConfig generalConfig = new GeneralConfig();
+        generalConfig.setMainPageCountryCode(selectedCountryCode);
+
+        SharedPreferences preferences = UtilsSharedPreferences.getSharedPreferencesFile(this, "GeneralConfig");
+        UtilsSharedPreferences.saveSharedPreferences(preferences, "GeneralConfig", generalConfig);
+    }
+
 
 }
