@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".views.MainActivity">
 
-    <!-- Carte en haut de l'écran -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
@@ -18,7 +17,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintDimensionRatio="1:1" />
 
-    <!-- Zone de contenu au milieu -->
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="0dp"
@@ -28,7 +26,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tabs" />
 
-    <!-- Onglets en bas de l'écran -->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tabs"
         android:layout_width="0dp"
@@ -40,7 +37,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ViewPager pour les fragments -->
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"
         android:layout_width="0dp"
