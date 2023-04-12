@@ -215,4 +215,10 @@ public class DatabaseViewModel extends AndroidViewModel {
         CountryDao countryDao = db.countryDao();
         return countryDao.getAll();
     }
+
+    public LiveData<List<Park>> getAllParks(Context context){
+        AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
+        ParkDao parkDao = db.parkDao();
+        return parkDao.getAll();
+    }
 }

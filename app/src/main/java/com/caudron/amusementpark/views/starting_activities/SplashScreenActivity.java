@@ -81,12 +81,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         getApiTotalItems(mApiViewModel::getParks, totalItems -> {
             mDatabaseViewModel.getCountParks(getApplicationContext()).observe(this, count -> {
                 if (count != null && count.equals(totalItems)){
-                    loadCoasters();
+                    determineAndLaunchNextActivity();
                 } else{
                     loadDataFromApi(mApiViewModel::getParks, data -> {
                         mTaskExecutor.execute(() -> {
                             mDatabaseViewModel.insertParks((ParksResponseDto) data, getApplicationContext());
-                            runOnUiThread(this::loadCoasters);
+                            runOnUiThread(this::determineAndLaunchNextActivity);
                         });
                     }, ParksResponseDto.class);
                 }
@@ -94,59 +94,59 @@ public class SplashScreenActivity extends AppCompatActivity {
         });
     }
 
-    private void loadCoasters() {
-        mBackgroundTaskInfoType.setText(R.string.loading_coasters);
-        getApiTotalItems(mApiViewModel::getCoasters, totalItems -> {
-            mDatabaseViewModel.getCountCoasters(getApplicationContext()).observe(this, count -> {
-                if (count != null && count.equals(totalItems)){
-                    loadImageUrls();
-                } else{
-                    loadDataFromApi(mApiViewModel::getCoasters, data -> {
-                        mTaskExecutor.execute(() -> {
-                            mDatabaseViewModel.insertCoasters((CoastersResponseDto) data, getApplicationContext());
-                            runOnUiThread(this::loadImageUrls);
-                        });
-                    }, CoastersResponseDto.class);
-                }
-            });
-        });
-    }
+//    private void loadCoasters() {
+//        mBackgroundTaskInfoType.setText(R.string.loading_coasters);
+//        getApiTotalItems(mApiViewModel::getCoasters, totalItems -> {
+//            mDatabaseViewModel.getCountCoasters(getApplicationContext()).observe(this, count -> {
+//                if (count != null && count.equals(totalItems)){
+//                    loadImageUrls();
+//                } else{
+//                    loadDataFromApi(mApiViewModel::getCoasters, data -> {
+//                        mTaskExecutor.execute(() -> {
+//                            mDatabaseViewModel.insertCoasters((CoastersResponseDto) data, getApplicationContext());
+//                            runOnUiThread(this::loadImageUrls);
+//                        });
+//                    }, CoastersResponseDto.class);
+//                }
+//            });
+//        });
+//    }
 
-    private void loadImageUrls() {
-        mBackgroundTaskInfoType.setText(R.string.loading_images);
-        getApiTotalItems(mApiViewModel::getImageUrls, totalItems -> {
-            mDatabaseViewModel.getCountImages(getApplicationContext()).observe(this, count -> {
-                if (count != null && count.equals(totalItems)){
-                    loadStatuses();
-                }else{
-                    loadDataFromApi(mApiViewModel::getImageUrls, data -> {
-                        mTaskExecutor.execute(() -> {
-                            mDatabaseViewModel.insertImages((ImagesResponseDto) data, getApplicationContext());
-                            runOnUiThread(this::loadStatuses);
-                        });
-                    }, ImagesResponseDto.class);
-                }
-            });
-        });
-    }
+//    private void loadImageUrls() {
+//        mBackgroundTaskInfoType.setText(R.string.loading_images);
+//        getApiTotalItems(mApiViewModel::getImageUrls, totalItems -> {
+//            mDatabaseViewModel.getCountImages(getApplicationContext()).observe(this, count -> {
+//                if (count != null && count.equals(totalItems)){
+//                    loadStatuses();
+//                }else{
+//                    loadDataFromApi(mApiViewModel::getImageUrls, data -> {
+//                        mTaskExecutor.execute(() -> {
+//                            mDatabaseViewModel.insertImages((ImagesResponseDto) data, getApplicationContext());
+//                            runOnUiThread(this::loadStatuses);
+//                        });
+//                    }, ImagesResponseDto.class);
+//                }
+//            });
+//        });
+//    }
 
-    private void loadStatuses() {
-        mBackgroundTaskInfoType.setText(R.string.loading_status);
-        getApiTotalItems(mApiViewModel::getStatuses, totalItems -> {
-            mDatabaseViewModel.getCountStatuses(getApplicationContext()).observe(this, count -> {
-                if (count != null && count.equals(totalItems)){
-                    determineAndLaunchNextActivity();
-                } else {
-                    loadDataFromApi(mApiViewModel::getStatuses, data -> {
-                        mTaskExecutor.execute(() -> {
-                            mDatabaseViewModel.insertStatuses((StatusesResponseDto) data, getApplicationContext());
-                            runOnUiThread(this::determineAndLaunchNextActivity);
-                        });
-                    }, StatusesResponseDto.class);
-                }
-            });
-        });
-    }
+//    private void loadStatuses() {
+//        mBackgroundTaskInfoType.setText(R.string.loading_status);
+//        getApiTotalItems(mApiViewModel::getStatuses, totalItems -> {
+//            mDatabaseViewModel.getCountStatuses(getApplicationContext()).observe(this, count -> {
+//                if (count != null && count.equals(totalItems)){
+//                    determineAndLaunchNextActivity();
+//                } else {
+//                    loadDataFromApi(mApiViewModel::getStatuses, data -> {
+//                        mTaskExecutor.execute(() -> {
+//                            mDatabaseViewModel.insertStatuses((StatusesResponseDto) data, getApplicationContext());
+//                            runOnUiThread(this::determineAndLaunchNextActivity);
+//                        });
+//                    }, StatusesResponseDto.class);
+//                }
+//            });
+//        });
+//    }
 
 
     private <T extends BaseResponseDto> void loadDataFromApi(Function2<String, Integer, LiveData<T>> apiCall, Consumer<T> onComplete, Class<T> clazz) {

@@ -23,6 +23,24 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"/>
 
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/save_offline_option"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
+
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/save_offline_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:layout_gravity="end"/>
+
+
     <Button
         android:id="@+id/save_button"
         android:layout_width="wrap_content"

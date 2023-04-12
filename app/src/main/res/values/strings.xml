@@ -15,4 +15,5 @@
     <string name="error_loading">An error occurred while loading the data</string>
     <string name="maj_datas">Updating data…</string>
     <string name="country_flag">Country flag</string>
+    <string name="save_offline_option">\"Do you want to make the information available offline as you navigate through the application?</string>
 </resources>

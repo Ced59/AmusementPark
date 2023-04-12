@@ -1,9 +1,11 @@
 package com.caudron.amusementpark.views.starting_activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -17,6 +19,7 @@ import com.caudron.amusementpark.models.entities.Country;
 import com.caudron.amusementpark.models.entities.general_preferences.GeneralConfig;
 import com.caudron.amusementpark.utils.UtilsSharedPreferences;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
+import com.caudron.amusementpark.views.MainActivity;
 import com.caudron.amusementpark.views.adapters.CountrySpinnerAdapter;
 
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ public class GeneralConfigActivity extends AppCompatActivity {
     private List<Country> listCountry;
     private DatabaseViewModel dbViewModel;
     private Spinner countrySpinner;
+    private SwitchCompat saveOfflineSwitch;
     private boolean isActivityDestroyed = false;
 
     @Override
@@ -36,12 +40,15 @@ public class GeneralConfigActivity extends AppCompatActivity {
 
         dbViewModel = new ViewModelProvider(this).get(DatabaseViewModel.class);
         countrySpinner = findViewById(R.id.country_spinner);
+        saveOfflineSwitch = findViewById(R.id.save_offline_switch);
 
         Button saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveSelectedCountryCode();
+                saveGeneralConfig();
+                Intent intent = new Intent(GeneralConfigActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -86,7 +93,7 @@ public class GeneralConfigActivity extends AppCompatActivity {
         isActivityDestroyed = true;
     }
 
-    private void saveSelectedCountryCode() {
+    private void saveGeneralConfig() {
         int selectedPosition = countrySpinner.getSelectedItemPosition();
         String selectedCountryCode;
 
@@ -98,8 +105,11 @@ public class GeneralConfigActivity extends AppCompatActivity {
             selectedCountryCode = listCountry.get(selectedPosition - 2).getCountryCode();
         }
 
+        boolean saveDatasOffline = saveOfflineSwitch.isChecked();
+
         GeneralConfig generalConfig = new GeneralConfig();
         generalConfig.setMainPageCountryCode(selectedCountryCode);
+        generalConfig.setMakeDatasOffline(saveDatasOffline);
 
         SharedPreferences preferences = UtilsSharedPreferences.getSharedPreferencesFile(this, "GeneralConfig");
         UtilsSharedPreferences.saveSharedPreferences(preferences, "GeneralConfig", generalConfig);

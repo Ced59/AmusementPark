@@ -32,7 +32,7 @@ public interface ParkDao {
     Flowable<List<Park>> getByCountryId(int countryId);
 
     @Query("SELECT * FROM parks")
-    Flowable<List<Park>> getAll();
+    LiveData<List<Park>> getAll();
 
     @Query("SELECT COUNT(*) FROM parks")
     LiveData<Integer> getCount();
