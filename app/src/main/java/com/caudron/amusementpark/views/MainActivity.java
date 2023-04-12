@@ -12,12 +12,16 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.caudron.amusementpark.R;
 import com.caudron.amusementpark.models.entities.Park;
 import com.caudron.amusementpark.models.entities.general_preferences.GeneralConfig;
 import com.caudron.amusementpark.utils.UtilsSharedPreferences;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
+import com.caudron.amusementpark.views.adapters.FragmentAdapter;
+import com.caudron.amusementpark.views.fragments.ContentFragment;
+import com.caudron.amusementpark.views.fragments.ParkListFragment;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -28,6 +32,8 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.maps.android.SphericalUtil;
 
 
@@ -37,12 +43,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private DatabaseViewModel mDatabaseViewModel;
     private GoogleMap mMap;
+    private TabLayout tabs;
+    private ViewPager2 viewPager;
     private String countryCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        tabs = findViewById(R.id.tabs);
+        viewPager = findViewById(R.id.view_pager);
 
         mDatabaseViewModel = new ViewModelProvider(this).get(DatabaseViewModel.class);
 
@@ -50,6 +60,26 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+
+        // Créer un adaptateur pour les fragments
+        FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
+
+        // Ajouter des fragments pour chaque onglet
+        adapter.addFragment(new ContentFragment("Onglet 1"));
+        adapter.addFragment(new ContentFragment("Onglet 2"));
+        adapter.addFragment(new ContentFragment("Onglet 3"));
+        adapter.addFragment(new ContentFragment("Onglet 4"));
+        adapter.addFragment(new ContentFragment("Onglet 5"));
+        adapter.addFragment(new ContentFragment("Onglet 6"));
+
+        // Configurer le ViewPager2 avec l'adaptateur
+        viewPager.setAdapter(adapter);
+
+        // Configurer le TabLayout pour utiliser le ViewPager2
+        new TabLayoutMediator(tabs, viewPager,
+                (tab, position) -> tab.setText("Onglet " + (position + 1))
+        ).attach();
 
     }
 
@@ -100,10 +130,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     else if (countryCode.equals("world")){
                         LatLng worldCenter = new LatLng(0, 0);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 1));
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 0));
                     } else {
                         LatLng worldCenter = new LatLng(0, 0);
                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 2));
+                    }
+
+                    // Mettre à jour la liste de parcs dans l'onglet 1
+                    ParkListFragment parkListFragment = (ParkListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.view_pager + ":" + 0);
+                    if (parkListFragment != null) {
+                        parkListFragment.updateParkList(parks);
                     }
                 }
             }
