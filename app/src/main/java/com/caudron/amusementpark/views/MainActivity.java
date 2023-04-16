@@ -2,6 +2,7 @@ package com.caudron.amusementpark.views;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 
@@ -34,6 +36,7 @@ import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewMode
 import com.caudron.amusementpark.views.adapters.FragmentAdapter;
 import com.caudron.amusementpark.views.fragments.ContentFragment;
 import com.caudron.amusementpark.views.fragments.ParkListFragment;
+import com.caudron.amusementpark.views.starting_activities.GeneralConfigActivity;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -163,6 +166,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (!hasFocus) {
                     autoCompletePopup.dismiss();
                 }
+            }
+        });
+
+        ImageView toolbarLogo = findViewById(R.id.toolbar_logo);
+        toolbarLogo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+                Intent intent = new Intent(getApplicationContext(), GeneralConfigActivity.class);
+                startActivity(intent);
             }
         });
 
