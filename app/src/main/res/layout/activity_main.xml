@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/dark_blue"
     tools:context=".views.MainActivity">
 
     <androidx.fragment.app.FragmentContainerView
@@ -35,7 +36,10 @@
         app:tabMode="scrollable"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:tabTextColor="@color/teal_200"
+        app:tabSelectedTextColor="@color/white"
+        app:tabIndicatorColor="@color/white"/>
 
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/view_pager"

@@ -1,5 +1,8 @@
 package com.caudron.amusementpark.views.adapters;
 
+import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,10 +10,12 @@ import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.caudron.amusementpark.R;
 import com.caudron.amusementpark.models.entities.Park;
+import com.caudron.amusementpark.utils.UtilsCountries;
 
 import java.util.List;
 
@@ -18,9 +23,12 @@ public class ParkListAdapter extends RecyclerView.Adapter<ParkListAdapter.ParkVi
 
     private OnItemClickListener mListener;
     private List<Park> mParkList;
+    private Park mSelectedPark;
+    private Context mContext;
 
-    public ParkListAdapter(List<Park> parkList) {
+    public ParkListAdapter(Context context, List<Park> parkList) {
         mParkList = parkList;
+        mContext = context;
     }
 
     public void updateParkList(List<Park> parkList) {
@@ -39,15 +47,24 @@ public class ParkListAdapter extends RecyclerView.Adapter<ParkListAdapter.ParkVi
     public void onBindViewHolder(@NonNull ParkViewHolder holder, int position) {
         Park park = mParkList.get(position);
         holder.mTextViewParkName.setText(park.getName());
-        if(park.getCountry() != null) {
-            holder.mTextViewParkLocation.setText(park.getCountry().getName());
+        holder.mTextViewParkLocation.setText(UtilsCountries.getLocaleCountryName(mContext.getApplicationContext(), park.getCountryCode()));
+
+
+        // Vérifier si le parc est sélectionné et définir la couleur de fond en conséquence
+        if (mSelectedPark != null && mSelectedPark.equals(park)) {
+            Drawable selectedBackground = ContextCompat.getDrawable(mContext, R.color.teal_700);
+            holder.itemView.setBackground(selectedBackground);
         } else {
-            holder.mTextViewParkLocation.setText("");
+            Drawable background = ContextCompat.getDrawable(mContext, R.color.dark_blue);
+            holder.itemView.setBackground(background);
         }
 
+        // Ajouter un OnClickListener pour inverser l'état de la sélection
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mSelectedPark = park;
+                notifyDataSetChanged();
                 if (mListener != null) {
                     mListener.onItemClick(park);
                 }

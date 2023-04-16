@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         new TabLayoutMediator(tabs, viewPager,
                 (tab, position) -> {
                     if (position == 0) {
-                        tab.setText("Liste des parcs");
+                        tab.setText("Parcs");
                     } else {
                         tab.setText("Onglet " + (position + 1));
                     }

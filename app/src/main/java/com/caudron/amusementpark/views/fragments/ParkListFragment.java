@@ -39,7 +39,7 @@ public class ParkListFragment extends Fragment {
         mRecyclerView = view.findViewById(R.id.recycler_view_park_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        mAdapter = new ParkListAdapter(mParkList);
+        mAdapter = new ParkListAdapter(getActivity(), mParkList);
         mRecyclerView.setAdapter(mAdapter);
 
         mAdapter.setOnItemClickListener(new ParkListAdapter.OnItemClickListener() {

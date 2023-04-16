@@ -12,7 +12,6 @@ import com.caudron.amusementpark.models.entities.Park;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.Single;
 
 @Dao
 public interface ParkDao {
@@ -28,8 +27,8 @@ public interface ParkDao {
     @Query("SELECT * FROM parks WHERE id = :id")
     Park getById(int id);
 
-    @Query("SELECT * FROM parks WHERE countryId = :countryId")
-    Flowable<List<Park>> getByCountryId(int countryId);
+    @Query("SELECT * FROM parks WHERE countryCode = :countryId")
+    Flowable<List<Park>> getByCountryCode(int countryId);
 
     @Query("SELECT * FROM parks")
     LiveData<List<Park>> getAll();
