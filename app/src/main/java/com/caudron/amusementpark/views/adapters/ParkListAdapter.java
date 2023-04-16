@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.caudron.amusementpark.R;
 import com.caudron.amusementpark.models.entities.Park;
 import com.caudron.amusementpark.utils.UtilsCountries;
+import com.google.android.material.card.MaterialCardView;
 
 import java.util.List;
 
@@ -52,11 +53,11 @@ public class ParkListAdapter extends RecyclerView.Adapter<ParkListAdapter.ParkVi
 
         // Vérifier si le parc est sélectionné et définir la couleur de fond en conséquence
         if (mSelectedPark != null && mSelectedPark.equals(park)) {
-            Drawable selectedBackground = ContextCompat.getDrawable(mContext, R.color.teal_700);
-            holder.itemView.setBackground(selectedBackground);
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.teal_700));
+            holder.cardView.setStrokeColor(ContextCompat.getColor(mContext, R.color.white));
         } else {
-            Drawable background = ContextCompat.getDrawable(mContext, R.color.dark_blue);
-            holder.itemView.setBackground(background);
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.dark_blue));
+            holder.cardView.setStrokeColor(ContextCompat.getColor(mContext, R.color.white));
         }
 
         // Ajouter un OnClickListener pour inverser l'état de la sélection
@@ -85,12 +86,14 @@ public class ParkListAdapter extends RecyclerView.Adapter<ParkListAdapter.ParkVi
 
         private TextView mTextViewParkName;
         private TextView mTextViewParkLocation;
+        public MaterialCardView cardView;
 
         public ParkViewHolder(View itemView) {
             super(itemView);
 
             mTextViewParkName = itemView.findViewById(R.id.text_view_park_name);
             mTextViewParkLocation = itemView.findViewById(R.id.text_view_park_location);
+            cardView = itemView.findViewById(R.id.card_view);
         }
     }
 
