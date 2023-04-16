@@ -37,6 +37,7 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.maps.android.SphericalUtil;
 
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private GoogleMap mMap;
     private TabLayout tabs;
     private ViewPager2 viewPager;
+    private ParkListFragment parkListFragment;
     private String countryCode;
 
     @Override
@@ -61,12 +63,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-
         // Créer un adaptateur pour les fragments
         FragmentAdapter adapter = new FragmentAdapter(getSupportFragmentManager(), getLifecycle());
 
         // Ajouter des fragments pour chaque onglet
-        adapter.addFragment(new ContentFragment("Onglet 1"));
+        parkListFragment = new ParkListFragment(new ArrayList<Park>(), mMap);
+        adapter.addFragment(parkListFragment);
         adapter.addFragment(new ContentFragment("Onglet 2"));
         adapter.addFragment(new ContentFragment("Onglet 3"));
         adapter.addFragment(new ContentFragment("Onglet 4"));
@@ -78,14 +80,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         // Configurer le TabLayout pour utiliser le ViewPager2
         new TabLayoutMediator(tabs, viewPager,
-                (tab, position) -> tab.setText("Onglet " + (position + 1))
+                (tab, position) -> {
+                    if (position == 0) {
+                        tab.setText("Liste des parcs");
+                    } else {
+                        tab.setText("Onglet " + (position + 1));
+                    }
+                }
         ).attach();
-
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        parkListFragment.setmMap(mMap);
 
         mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
             @Override
@@ -122,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                                     if (location != null) {
                                         LatLng currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
                                         LatLngBounds bounds = calculateBounds(currentLocation, 100000);
-                                        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0));
+                                        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0));
                                     }
                                 }
                             });
@@ -130,14 +138,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                     else if (countryCode.equals("world")){
                         LatLng worldCenter = new LatLng(0, 0);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 0));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 0));
                     } else {
                         LatLng worldCenter = new LatLng(0, 0);
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 2));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 2));
                     }
 
-                    // Mettre à jour la liste de parcs dans l'onglet 1
-                    ParkListFragment parkListFragment = (ParkListFragment) getSupportFragmentManager().findFragmentByTag("android:switcher:" + R.id.view_pager + ":" + 0);
                     if (parkListFragment != null) {
                         parkListFragment.updateParkList(parks);
                     }
@@ -156,5 +162,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         SharedPreferences preferences = UtilsSharedPreferences.getSharedPreferencesFile(this, "GeneralConfig");
         GeneralConfig generalConfig = (GeneralConfig) UtilsSharedPreferences.getSharedPreferences(preferences, "GeneralConfig", GeneralConfig.class);
         return generalConfig.getMainPageCountryCode();
+    }
+
+    public GoogleMap getMap(){
+        return mMap;
     }
 }

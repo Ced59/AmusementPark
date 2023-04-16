@@ -3,6 +3,7 @@ package com.caudron.amusementpark.views.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +16,7 @@ import java.util.List;
 
 public class ParkListAdapter extends RecyclerView.Adapter<ParkListAdapter.ParkViewHolder> {
 
+    private OnItemClickListener mListener;
     private List<Park> mParkList;
 
     public ParkListAdapter(List<Park> parkList) {
@@ -37,12 +39,29 @@ public class ParkListAdapter extends RecyclerView.Adapter<ParkListAdapter.ParkVi
     public void onBindViewHolder(@NonNull ParkViewHolder holder, int position) {
         Park park = mParkList.get(position);
         holder.mTextViewParkName.setText(park.getName());
-        holder.mTextViewParkLocation.setText(park.getCountry().getName());
+        if(park.getCountry() != null) {
+            holder.mTextViewParkLocation.setText(park.getCountry().getName());
+        } else {
+            holder.mTextViewParkLocation.setText("");
+        }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onItemClick(park);
+                }
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
         return mParkList.size();
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Park park);
     }
 
     public static class ParkViewHolder extends RecyclerView.ViewHolder {
@@ -57,5 +76,10 @@ public class ParkListAdapter extends RecyclerView.Adapter<ParkListAdapter.ParkVi
             mTextViewParkLocation = itemView.findViewById(R.id.text_view_park_location);
         }
     }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        mListener = listener;
+    }
 }
+
 
