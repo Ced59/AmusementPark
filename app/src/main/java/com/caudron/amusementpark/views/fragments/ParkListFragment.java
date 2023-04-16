@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -26,6 +27,7 @@ public class ParkListFragment extends Fragment {
     private ParkListAdapter mAdapter;
     private List<Park> mParkList;
     private GoogleMap mMap;
+    private TextView mNoParksTextView;
 
     public ParkListFragment(List<Park> parkList, GoogleMap map) {
         mParkList = parkList;
@@ -36,6 +38,7 @@ public class ParkListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_park_list, container, false);
 
+        mNoParksTextView = view.findViewById(R.id.no_parks_textview);
         mRecyclerView = view.findViewById(R.id.recycler_view_park_list);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -61,6 +64,12 @@ public class ParkListFragment extends Fragment {
     public void updateParkList(List<Park> parkList) {
         mParkList = parkList;
         mAdapter.updateParkList(mParkList);
+
+        if (mParkList.size() == 0) {
+            mNoParksTextView.setVisibility(View.VISIBLE);
+        } else {
+            mNoParksTextView.setVisibility(View.GONE);
+        }
     }
 
 }

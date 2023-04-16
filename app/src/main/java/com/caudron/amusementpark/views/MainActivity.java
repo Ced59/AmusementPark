@@ -235,6 +235,13 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         });
+
+        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                updateVisibleParksOnRecyclerView();
+            }
+        });
     }
 
     private void loadParks() {
@@ -280,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         parkListFragment.updateParkList(parks);
                     }
                 }
+                updateVisibleParksOnRecyclerView();
             }
         });
     }
@@ -371,6 +379,24 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         return filteredParks;
+    }
+
+    private void updateVisibleParksOnRecyclerView() {
+        if (mParkList != null) {
+            List<Park> visibleParks = new ArrayList<>();
+            LatLngBounds visibleBounds = mMap.getProjection().getVisibleRegion().latLngBounds;
+
+            for (Park park : mParkList) {
+                LatLng parkLatLng = new LatLng(park.getLatitude(), park.getLongitude());
+                if (visibleBounds.contains(parkLatLng)) {
+                    visibleParks.add(park);
+                }
+            }
+
+            if (parkListFragment != null) {
+                parkListFragment.updateParkList(visibleParks);
+            }
+        }
     }
 
 
