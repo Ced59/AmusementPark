@@ -37,6 +37,7 @@
             android:exported="false"/>
         <activity
             android:name=".views.MainActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"
             android:exported="false"/>
     </application>
 

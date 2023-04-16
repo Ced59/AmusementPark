@@ -6,6 +6,12 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+import android.widget.PopupWindow;
 
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -22,6 +28,7 @@ import androidx.viewpager2.widget.ViewPager2;
 import com.caudron.amusementpark.R;
 import com.caudron.amusementpark.models.entities.Park;
 import com.caudron.amusementpark.models.entities.general_preferences.GeneralConfig;
+import com.caudron.amusementpark.utils.UtilsKeyboard;
 import com.caudron.amusementpark.utils.UtilsSharedPreferences;
 import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewModel;
 import com.caudron.amusementpark.views.adapters.FragmentAdapter;
@@ -47,6 +54,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+    private static final int AUTO_COMPLETE_POPUP_MAX_HEIGHT = 700;
 
     private DatabaseViewModel mDatabaseViewModel;
     private GoogleMap mMap;
@@ -58,11 +66,18 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private List<Park> mParkList;
     private List<Park> mFilteredParkList;
     private SearchView searchView;
+    private ArrayAdapter<String> autoCompleteAdapter;
+    private PopupWindow autoCompletePopup;
+    private List<String> parkNameList;
+    private ListView autoCompleteListView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        findViewById(R.id.focus_dummy).requestFocus();
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -103,19 +118,54 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
         ).attach();
 
+        parkNameList = new ArrayList<>();
+        autoCompleteAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, parkNameList);
+        autoCompletePopup = new PopupWindow(this);
+        autoCompleteListView = new ListView(this);
+        autoCompleteListView.setAdapter(autoCompleteAdapter);
+
         searchView = findViewById(R.id.search_view);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                List<Park> filteredParks = findParksByName(query, mParkList);
+                if (filteredParks.size() == 1) {
+                    centerMapOnPark(filteredParks.get(0));
+                }
+                UtilsKeyboard.hideVirtualKeyboard(MainActivity.this);
+                autoCompletePopup.dismiss();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
                 updateParkListWithSearchQuery(newText);
+                if (!newText.isEmpty()) {
+                    showAutoCompletePopup(newText);
+                } else {
+                    autoCompletePopup.dismiss();
+                }
                 return true;
             }
         });
+
+        autoCompleteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                searchView.setQuery(parkNameList.get(position), true);
+                autoCompletePopup.dismiss();
+            }
+        });
+
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    autoCompletePopup.dismiss();
+                }
+            }
+        });
+
     }
 
     @SuppressLint("PotentialBehaviorOverride")
@@ -259,4 +309,55 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             parkListFragment.updateParkList(filteredParkList);
         }
     }
+
+    private void showAutoCompletePopup(String query) {
+        List<String> filteredParkNames = new ArrayList<>();
+        for (Park park : mParkList) {
+            if (park.getName().toLowerCase().contains(query.toLowerCase())) {
+                filteredParkNames.add(park.getName());
+            }
+        }
+        parkNameList.clear();
+        parkNameList.addAll(filteredParkNames);
+        autoCompleteAdapter.notifyDataSetChanged();
+
+        if (!autoCompletePopup.isShowing() && !filteredParkNames.isEmpty()) {
+            autoCompletePopup.setWidth(searchView.getWidth());
+
+            int totalItemsHeight = 0;
+            for (int i = 0; i < autoCompleteAdapter.getCount(); i++) {
+                View listItem = autoCompleteAdapter.getView(i, null, autoCompleteListView);
+                listItem.measure(0, 0);
+                totalItemsHeight += listItem.getMeasuredHeight();
+            }
+
+            // Limiter la hauteur de la PopupWindow
+            int popupHeight = Math.min(totalItemsHeight, AUTO_COMPLETE_POPUP_MAX_HEIGHT);
+            autoCompletePopup.setHeight(popupHeight);
+
+            autoCompletePopup.setContentView(autoCompleteListView);
+            autoCompletePopup.showAsDropDown(searchView);
+        } else if (filteredParkNames.isEmpty()) {
+            autoCompletePopup.dismiss();
+        }
+    }
+
+    private void centerMapOnPark(Park park) {
+        if (park != null && mMap != null) {
+            LatLng parkLocation = new LatLng(park.getLatitude(), park.getLongitude());
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(parkLocation, 16));
+        }
+    }
+
+    private List<Park> findParksByName(String parkName, List<Park> parks) {
+        List<Park> filteredParks = new ArrayList<>();
+        for (Park park : parks) {
+            if (park.getName().equalsIgnoreCase(parkName)) {
+                filteredParks.add(park);
+            }
+        }
+        return filteredParks;
+    }
+
+
 }
