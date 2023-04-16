@@ -6,6 +6,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 
 
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Toolbar toolbar;
     private List<Park> mParkList;
     private List<Park> mFilteredParkList;
+    private SearchView searchView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +102,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
         ).attach();
+
+        searchView = findViewById(R.id.search_view);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                updateParkListWithSearchQuery(newText);
+                return true;
+            }
+        });
     }
 
     @SuppressLint("PotentialBehaviorOverride")
@@ -141,13 +158,14 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             @Override
             public void onMapClick(LatLng latLng) {
                 boolean markerClicked = false;
-                for (Park park : mFilteredParkList) {
-                    if (park.getLatitude() == latLng.latitude && park.getLongitude() == latLng.longitude) {
-                        markerClicked = true;
-                        break;
+                if (mFilteredParkList != null){
+                    for (Park park : mFilteredParkList) {
+                        if (park.getLatitude() == latLng.latitude && park.getLongitude() == latLng.longitude) {
+                            markerClicked = true;
+                            break;
+                        }
                     }
                 }
-
                 if (!markerClicked) {
                     parkListFragment.updateParkList(mParkList);
                 }
@@ -226,5 +244,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
         return filteredParkList;
+    }
+
+    private void updateParkListWithSearchQuery(String query) {
+        if (query.isEmpty()) {
+            parkListFragment.updateParkList(mParkList);
+        } else {
+            List<Park> filteredParkList = new ArrayList<>();
+            for (Park park : mParkList) {
+                if (park.getName().toLowerCase().contains(query.toLowerCase())) {
+                    filteredParkList.add(park);
+                }
+            }
+            parkListFragment.updateParkList(filteredParkList);
+        }
     }
 }

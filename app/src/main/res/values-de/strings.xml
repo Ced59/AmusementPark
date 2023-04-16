@@ -17,4 +17,5 @@
     <string name="country_flag">Landesflagge</string>
     <string name="save_offline_option">Möchten Sie die Informationen beim Navigieren durch die Anwendung schrittweise offline verfügbar machen?</string>
     <string name="logo_description">Anwendungslogo</string>
+    <string name="rechercher_un_parc">Nach einem Freizeitpark suchen</string>
 </resources>
