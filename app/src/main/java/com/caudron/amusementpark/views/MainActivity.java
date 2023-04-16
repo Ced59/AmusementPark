@@ -1,6 +1,7 @@
 package com.caudron.amusementpark.views;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -31,6 +32,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -51,6 +53,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ParkListFragment parkListFragment;
     private String countryCode;
     private Toolbar toolbar;
+    private List<Park> mParkList;
+    private List<Park> mFilteredParkList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         ).attach();
     }
 
+    @SuppressLint("PotentialBehaviorOverride")
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -114,18 +119,56 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             return;
         }
         mMap.setMyLocationEnabled(true);
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                if (marker.getTag() != null) {
+                    String markTag = marker.getTag().toString();
+                    int parkId = Integer.parseInt(markTag);
+                    mFilteredParkList = findParkById(parkId, mParkList);
+                    if (mFilteredParkList.size() > 0) {
+                        parkListFragment.updateParkList(mFilteredParkList);
+                    }
+                }
+
+                marker.showInfoWindow();
+                return true;
+            }
+        });
+
+        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                boolean markerClicked = false;
+                for (Park park : mFilteredParkList) {
+                    if (park.getLatitude() == latLng.latitude && park.getLongitude() == latLng.longitude) {
+                        markerClicked = true;
+                        break;
+                    }
+                }
+
+                if (!markerClicked) {
+                    parkListFragment.updateParkList(mParkList);
+                }
+            }
+        });
     }
 
     private void loadParks() {
         mDatabaseViewModel.getAllParks(getApplicationContext()).observe(this, new Observer<List<Park>>() {
             @Override
             public void onChanged(List<Park> parks) {
+
+                mParkList = parks;
+
                 if (mMap != null) {
                     mMap.clear();
 
                     for (Park park : parks) {
                         LatLng parkLocation = new LatLng(park.getLatitude(), park.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(parkLocation).title(park.getName()));
+                        Marker marker = mMap.addMarker(new MarkerOptions().position(parkLocation).title(park.getName()));
+                        marker.setTag(park.getId());
                     }
 
                     if (countryCode.equals("geoloc")) {
@@ -173,5 +216,15 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     public GoogleMap getMap(){
         return mMap;
+    }
+
+    private List<Park> findParkById(int parkId, List<Park> parks) {
+        List<Park> filteredParkList = new ArrayList<>();
+        for (Park park : parks) {
+            if (park.getId() == parkId) {
+                filteredParkList.add(park);
+            }
+        }
+        return filteredParkList;
     }
 }
