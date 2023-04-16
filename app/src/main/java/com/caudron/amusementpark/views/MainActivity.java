@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 
@@ -183,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     @SuppressLint("PotentialBehaviorOverride")
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
         parkListFragment.setmMap(mMap);
 
@@ -202,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
-            public boolean onMarkerClick(Marker marker) {
+            public boolean onMarkerClick(@NonNull Marker marker) {
                 if (marker.getTag() != null) {
                     String markTag = marker.getTag().toString();
                     int parkId = Integer.parseInt(markTag);
@@ -219,7 +220,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
+            public void onMapClick(@NonNull LatLng latLng) {
                 boolean markerClicked = false;
                 if (mFilteredParkList != null){
                     for (Park park : mFilteredParkList) {
