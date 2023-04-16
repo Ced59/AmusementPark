@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import androidx.appcompat.widget.Toolbar;
+
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -48,11 +50,16 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ViewPager2 viewPager;
     private ParkListFragment parkListFragment;
     private String countryCode;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         tabs = findViewById(R.id.tabs);
         viewPager = findViewById(R.id.view_pager);
 

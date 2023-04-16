@@ -16,4 +16,5 @@
     <string name="maj_datas">Mise à jour des données en cours…</string>
     <string name="country_flag">Drapeau du pays</string>
     <string name="save_offline_option">Souhaitez vous rendre les informations disponibles hors ligne au fur et à mesure de votre navigation dans l\'application?</string>
+    <string name="logo_description">Logo de l\'application</string>
 </resources>

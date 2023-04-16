@@ -16,4 +16,5 @@
     <string name="maj_datas">Daten werden aktualisiert…</string>
     <string name="country_flag">Landesflagge</string>
     <string name="save_offline_option">Möchten Sie die Informationen beim Navigieren durch die Anwendung schrittweise offline verfügbar machen?</string>
+    <string name="logo_description">Anwendungslogo</string>
 </resources>

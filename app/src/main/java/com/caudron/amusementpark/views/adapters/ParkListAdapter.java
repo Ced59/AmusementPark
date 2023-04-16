@@ -56,7 +56,7 @@ public class ParkListAdapter extends RecyclerView.Adapter<ParkListAdapter.ParkVi
             holder.cardView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.teal_700));
             holder.cardView.setStrokeColor(ContextCompat.getColor(mContext, R.color.white));
         } else {
-            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.dark_blue));
+            holder.cardView.setCardBackgroundColor(ContextCompat.getColor(mContext, R.color.dark_blue_lighter));
             holder.cardView.setStrokeColor(ContextCompat.getColor(mContext, R.color.white));
         }
 
