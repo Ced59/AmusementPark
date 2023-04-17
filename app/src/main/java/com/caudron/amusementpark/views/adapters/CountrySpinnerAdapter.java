@@ -1,5 +1,7 @@
 package com.caudron.amusementpark.views.adapters;
 
+import static android.provider.Settings.System.getString;
+
 import android.content.Context;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -13,36 +15,34 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.caudron.amusementpark.R;
+import com.caudron.amusementpark.models.entities.Country;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public class CountrySpinnerAdapter extends ArrayAdapter<String> {
-    private final List<String> countryNames;
-    private final List<String> countryCodes;
+public class CountrySpinnerAdapter extends ArrayAdapter<Country> {
+    private final List<Country> countries;
     private final Context context;
 
-
-    public CountrySpinnerAdapter(Context context, List<String> countryNames, List<String> countryCodes) {
-        super(context, R.layout.spinner_country_item, countryNames);
+    public CountrySpinnerAdapter(Context context, List<Country> countries) {
+        super(context, R.layout.spinner_country_item, countries);
         this.context = context;
 
-        List<Pair<String, String>> countryPairs = new ArrayList<>();
-        for (int i = 2; i < countryNames.size(); i++) {
-            countryPairs.add(new Pair<>(countryCodes.get(i - 2), countryNames.get(i)));
-        }
+        this.countries = new ArrayList<>();
 
-        countryPairs.sort(Comparator.comparing(pair -> pair.second));
+        Country countryGeoloc = new Country();
+        countryGeoloc.setCountryCode("geoloc");
+        countryGeoloc.setName(context.getString(R.string.geolocation_fonction));
+        Country countryWholeWorld = new Country();
+        countryWholeWorld.setCountryCode("world");
+        countryWholeWorld.setName(context.getString(R.string.all_world));
+        this.countries.add(countryGeoloc);
+        this.countries.add(countryWholeWorld);
 
-        this.countryNames = new ArrayList<>();
-        this.countryCodes = new ArrayList<>();
-        this.countryNames.add(countryNames.get(0));
-        this.countryNames.add(countryNames.get(1));
-        for (Pair<String, String> pair : countryPairs) {
-            this.countryCodes.add(pair.first);
-            this.countryNames.add(pair.second);
+        for (Country country : countries) {
+            this.countries.add(country);
         }
     }
 
@@ -63,21 +63,21 @@ public class CountrySpinnerAdapter extends ArrayAdapter<String> {
         ImageView flagImageView = view.findViewById(R.id.flag_image);
         TextView countryNameTextView = view.findViewById(R.id.country_name);
 
+        Country country = countries.get(position);
+        String countryCode = country.getCountryCode();
+
         if (position == 0) {
             flagImageView.setImageResource(R.drawable.geoloc);
-            flagImageView.setVisibility(View.VISIBLE);
-        }else if (position == 1) {
+        } else if (position == 1) {
             flagImageView.setImageResource(R.drawable.world);
-            flagImageView.setVisibility(View.VISIBLE);
         } else {
-            String countryCode = countryCodes.get(position - 2);
             int flagId = context.getResources().getIdentifier("flag_" + countryCode.toLowerCase(), "drawable", context.getPackageName());
             flagImageView.setImageResource(flagId);
-            flagImageView.setVisibility(View.VISIBLE);
         }
 
-        countryNameTextView.setText(countryNames.get(position));
+        countryNameTextView.setText(country.getName());
 
         return view;
     }
 }
+

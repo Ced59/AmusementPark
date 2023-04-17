@@ -83,7 +83,7 @@ public class GeneralConfigActivity extends AppCompatActivity {
                     }
                 }
 
-                ArrayAdapter<String> countryAdapter = new CountrySpinnerAdapter(GeneralConfigActivity.this, countryNames, countryCodes);
+                ArrayAdapter<Country> countryAdapter = new CountrySpinnerAdapter(GeneralConfigActivity.this, listCountry);
                 countrySpinner.setAdapter(countryAdapter);
             }
         });
@@ -96,19 +96,23 @@ public class GeneralConfigActivity extends AppCompatActivity {
     }
 
     private void saveGeneralConfig() {
-        int selectedPosition = countrySpinner.getSelectedItemPosition();
+        int selectedPosition = countrySpinner.getSelectedItemPosition() - 2;
+        Country selectedCountry;
         String selectedCountryCode;
         String selectedCountryName;
 
-        if (selectedPosition == 0) {
-            selectedCountryCode = "geoloc";
-            selectedCountryName = "geoloc";
-        } else if (selectedPosition == 1) {
-            selectedCountryCode = "world";
-            selectedCountryName = "world";
+        if (selectedPosition >= 0) {
+            selectedCountry = listCountry.get(selectedPosition);
+            selectedCountryCode = selectedCountry.getCountryCode();
+            selectedCountryName = selectedCountry.getName();
         } else {
-            selectedCountryCode = listCountry.get(selectedPosition).getCountryCode();
-            selectedCountryName = listCountry.get(selectedPosition).getName();
+            if (selectedPosition == -2) {
+                selectedCountryCode = "geoloc";
+                selectedCountryName = "geoloc";
+            } else {
+                selectedCountryCode = "world";
+                selectedCountryName = "world";
+            }
         }
 
         boolean saveDatasOffline = saveOfflineSwitch.isChecked();
@@ -121,6 +125,7 @@ public class GeneralConfigActivity extends AppCompatActivity {
         SharedPreferences preferences = UtilsSharedPreferences.getSharedPreferencesFile(this, "GeneralConfig");
         UtilsSharedPreferences.saveSharedPreferences(preferences, "GeneralConfig", generalConfig);
     }
+
 
 
 }
