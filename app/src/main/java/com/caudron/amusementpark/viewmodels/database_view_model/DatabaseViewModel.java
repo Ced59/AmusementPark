@@ -124,7 +124,21 @@ public class DatabaseViewModel extends AndroidViewModel {
         for(Park park : parks){
             Country country = park.getCountry();
             if (country != null){
-                park.setCountryId(country.getName());
+                try {
+                    String nameCountryApi = country.getName();
+                    String nameCountryFormatted = UtilsStrings.extractCountryName(nameCountryApi);
+                    country.setName(nameCountryFormatted);
+                    UtilsCountries.fillCountryCode(country);
+                    db.countryDao().insert(country);
+                    park.setCountryCode(country.getCountryCode());
+                } catch (SQLiteConstraintException e) {
+                    Country existingCountry = db.countryDao().getCountryByName(country.getName());
+                    if (existingCountry != null){
+                        UtilsCountries.fillCountryCode(country);
+                        db.countryDao().update(country);
+                        park.setCountryCode(country.getCountryCode());
+                    }
+                }
             }
             Park existingPark = parkDao.getById(park.getId());
             if (existingPark == null){
@@ -133,21 +147,7 @@ public class DatabaseViewModel extends AndroidViewModel {
                 parkDao.update(park);
             }
 
-            if (country != null){
-                try {
-                    String nameCountryApi = country.getName();
-                    String nameCountryFormatted = UtilsStrings.extractCountryName(nameCountryApi);
-                    country.setName(nameCountryFormatted);
-                    UtilsCountries.fillCountryCode(country);
-                    db.countryDao().insert(country);
-                } catch (SQLiteConstraintException e) {
-                    Country existingCountry = db.countryDao().getCountryByName(country.getName());
-                    if (existingCountry != null){
-                        UtilsCountries.fillCountryCode(country);
-                        db.countryDao().update(country);
-                    }
-                }
-            }
+
         }
     }
 
@@ -214,5 +214,11 @@ public class DatabaseViewModel extends AndroidViewModel {
         AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
         CountryDao countryDao = db.countryDao();
         return countryDao.getAll();
+    }
+
+    public LiveData<List<Park>> getAllParks(Context context){
+        AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
+        ParkDao parkDao = db.parkDao();
+        return parkDao.getAll();
     }
 }

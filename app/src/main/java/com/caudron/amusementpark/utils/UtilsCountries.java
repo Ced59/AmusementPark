@@ -1,5 +1,7 @@
 package com.caudron.amusementpark.utils;
 
+import android.content.Context;
+
 import com.caudron.amusementpark.models.entities.Country;
 
 import java.util.List;
@@ -265,6 +267,15 @@ public class UtilsCountries {
                     country.setCountryCode("");
                     break;
 
+        }
+    }
+
+    public static String getLocaleCountryName(Context context, String countryCode){
+        int resourceId = context.getResources().getIdentifier("country_" + countryCode.toLowerCase(), "string", context.getPackageName());
+        if (resourceId != 0) {
+            return context.getString(resourceId);
+        } else {
+            return countryCode;
         }
     }
 }

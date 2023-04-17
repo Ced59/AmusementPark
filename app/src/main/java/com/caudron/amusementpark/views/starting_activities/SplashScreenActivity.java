@@ -99,12 +99,12 @@ public class SplashScreenActivity extends AppCompatActivity {
         getApiTotalItems(mApiViewModel::getCoasters, totalItems -> {
             mDatabaseViewModel.getCountCoasters(getApplicationContext()).observe(this, count -> {
                 if (count != null && count.equals(totalItems)){
-                    loadImageUrls();
+                    loadStatuses();
                 } else{
                     loadDataFromApi(mApiViewModel::getCoasters, data -> {
                         mTaskExecutor.execute(() -> {
                             mDatabaseViewModel.insertCoasters((CoastersResponseDto) data, getApplicationContext());
-                            runOnUiThread(this::loadImageUrls);
+                            runOnUiThread(this::loadStatuses);
                         });
                     }, CoastersResponseDto.class);
                 }
@@ -112,23 +112,23 @@ public class SplashScreenActivity extends AppCompatActivity {
         });
     }
 
-    private void loadImageUrls() {
-        mBackgroundTaskInfoType.setText(R.string.loading_images);
-        getApiTotalItems(mApiViewModel::getImageUrls, totalItems -> {
-            mDatabaseViewModel.getCountImages(getApplicationContext()).observe(this, count -> {
-                if (count != null && count.equals(totalItems)){
-                    loadStatuses();
-                }else{
-                    loadDataFromApi(mApiViewModel::getImageUrls, data -> {
-                        mTaskExecutor.execute(() -> {
-                            mDatabaseViewModel.insertImages((ImagesResponseDto) data, getApplicationContext());
-                            runOnUiThread(this::loadStatuses);
-                        });
-                    }, ImagesResponseDto.class);
-                }
-            });
-        });
-    }
+//    private void loadImageUrls() {
+//        mBackgroundTaskInfoType.setText(R.string.loading_images);
+//        getApiTotalItems(mApiViewModel::getImageUrls, totalItems -> {
+//            mDatabaseViewModel.getCountImages(getApplicationContext()).observe(this, count -> {
+//                if (count != null && count.equals(totalItems)){
+//                    loadStatuses();
+//                }else{
+//                    loadDataFromApi(mApiViewModel::getImageUrls, data -> {
+//                        mTaskExecutor.execute(() -> {
+//                            mDatabaseViewModel.insertImages((ImagesResponseDto) data, getApplicationContext());
+//                            runOnUiThread(this::loadStatuses);
+//                        });
+//                    }, ImagesResponseDto.class);
+//                }
+//            });
+//        });
+//    }
 
     private void loadStatuses() {
         mBackgroundTaskInfoType.setText(R.string.loading_status);

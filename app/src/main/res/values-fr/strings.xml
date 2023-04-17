@@ -15,4 +15,9 @@
     <string name="error_loading">Une erreur s\'est produite lors du chargement des données.</string>
     <string name="maj_datas">Mise à jour des données en cours…</string>
     <string name="country_flag">Drapeau du pays</string>
+    <string name="save_offline_option">Souhaitez vous rendre les informations disponibles hors ligne au fur et à mesure de votre navigation dans l\'application?</string>
+    <string name="logo_description">Logo de l\'application</string>
+    <string name="no_park">Pas de parc d\'attraction dans cette zone…</string>
+    <string name="rechercher_un_parc">Rechercher un parc</string>
+    <string name="num_parks_format">Nombre de parcs dans la zone : %1$d</string>
 </resources>

@@ -5,7 +5,6 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import androidx.room.Relation;
 
 @Entity(tableName = "parks")
 public class Park {
@@ -15,8 +14,8 @@ public class Park {
     @Ignore
     private String idUri;
     private String name;
-    @ColumnInfo(name = "countryId")
-    private String countryId;
+    @ColumnInfo(name = "countryCode")
+    private String countryCode;
     @Ignore
     private Country country;
     private double latitude;
@@ -38,12 +37,12 @@ public class Park {
         this.name = name;
     }
 
-    public String getCountryId() {
-        return countryId;
+    public String getCountryCode() {
+        return countryCode;
     }
 
-    public void setCountryId(String countryId) {
-        this.countryId = countryId;
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 
     public Country getCountry() {

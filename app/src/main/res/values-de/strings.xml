@@ -15,4 +15,9 @@
     <string name="error_loading">Beim Laden der Daten ist ein Fehler aufgetreten</string>
     <string name="maj_datas">Daten werden aktualisiert…</string>
     <string name="country_flag">Landesflagge</string>
+    <string name="save_offline_option">Möchten Sie die Informationen beim Navigieren durch die Anwendung schrittweise offline verfügbar machen?</string>
+    <string name="logo_description">Anwendungslogo</string>
+    <string name="no_park">Kein Freizeitpark in dieser Gegend…</string>
+    <string name="rechercher_un_parc">Nach einem Freizeitpark suchen</string>
+    <string name="num_parks_format">"Anzahl der Parks in der Gegend: %1$d "</string>
 </resources>
