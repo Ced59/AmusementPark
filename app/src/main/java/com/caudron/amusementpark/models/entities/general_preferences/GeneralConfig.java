@@ -3,6 +3,7 @@ package com.caudron.amusementpark.models.entities.general_preferences;
 public class GeneralConfig {
 
     private String mainPageCountryCode;
+    private String mainPageCountryName;
     private boolean makeDatasOffline;
 
     public String getMainPageCountryCode() {
@@ -19,5 +20,13 @@ public class GeneralConfig {
 
     public void setMakeDatasOffline(boolean makeDatasOffline) {
         this.makeDatasOffline = makeDatasOffline;
+    }
+
+    public String getMainPageCountryName() {
+        return mainPageCountryName;
+    }
+
+    public void setMainPageCountryName(String mainPageCountryName) {
+        this.mainPageCountryName = mainPageCountryName;
     }
 }

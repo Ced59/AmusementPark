@@ -62,6 +62,8 @@ public class GeneralConfigActivity extends AppCompatActivity {
                 listCountry = countries;
 
                 List<String> countryCodes = new ArrayList<>();
+                countryCodes.add("geoloc");
+                countryCodes.add("world");
                 for (Country country : listCountry) {
                     countryCodes.add(country.getCountryCode());
                 }
@@ -96,19 +98,24 @@ public class GeneralConfigActivity extends AppCompatActivity {
     private void saveGeneralConfig() {
         int selectedPosition = countrySpinner.getSelectedItemPosition();
         String selectedCountryCode;
+        String selectedCountryName;
 
         if (selectedPosition == 0) {
             selectedCountryCode = "geoloc";
+            selectedCountryName = "geoloc";
         } else if (selectedPosition == 1) {
             selectedCountryCode = "world";
+            selectedCountryName = "world";
         } else {
-            selectedCountryCode = listCountry.get(selectedPosition - 2).getCountryCode();
+            selectedCountryCode = listCountry.get(selectedPosition).getCountryCode();
+            selectedCountryName = listCountry.get(selectedPosition).getName();
         }
 
         boolean saveDatasOffline = saveOfflineSwitch.isChecked();
 
         GeneralConfig generalConfig = new GeneralConfig();
         generalConfig.setMainPageCountryCode(selectedCountryCode);
+        generalConfig.setMainPageCountryName(selectedCountryName);
         generalConfig.setMakeDatasOffline(saveDatasOffline);
 
         SharedPreferences preferences = UtilsSharedPreferences.getSharedPreferencesFile(this, "GeneralConfig");

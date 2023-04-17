@@ -5,10 +5,12 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -22,10 +24,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.caudron.amusementpark.R;
@@ -43,6 +43,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -54,8 +55,10 @@ import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.maps.android.SphericalUtil;
 
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final int AUTO_COMPLETE_POPUP_MAX_HEIGHT = 700;
@@ -65,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TabLayout tabs;
     private ViewPager2 viewPager;
     private ParkListFragment parkListFragment;
-    private String countryCode;
+    private String countryName;
     private Toolbar toolbar;
     private List<Park> mParkList;
     private List<Park> mFilteredParkList;
@@ -91,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         mDatabaseViewModel = new ViewModelProvider(this).get(DatabaseViewModel.class);
 
-        countryCode = getSelectedCountryCode();
+        countryName = getSelectedCountryCode();
 
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
@@ -260,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                         marker.setTag(park.getId());
                     }
 
-                    if (countryCode.equals("geoloc")) {
+                    if (countryName.equals("geoloc")) {
                         FusedLocationProviderClient locationClient = LocationServices.getFusedLocationProviderClient(MainActivity.this);
                         if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                             locationClient.getLastLocation().addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
@@ -275,12 +278,28 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                             });
                         }
                     }
-                    else if (countryCode.equals("world")){
+                    else if (countryName.equals("world")){
                         LatLng worldCenter = new LatLng(0, 0);
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 0));
                     } else {
-                        LatLng worldCenter = new LatLng(0, 0);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(worldCenter, 2));
+                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
+                        try {
+                            List<Address> addressList = geocoder.getFromLocationName(countryName, 1);
+                            if (!addressList.isEmpty()) {
+                                LatLng latLng = new LatLng(addressList.get(0).getLatitude(), addressList.get(0).getLongitude());
+                                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(CameraPosition.builder().target(latLng).zoom(5).build()));
+                            } else {
+                                Log.e("MapsActivity", "No result found for country code: " + countryName);
+                                // fallback to world center
+                                LatLng latLng = new LatLng(0, 0);
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 0));
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            // fallback to world center
+                            LatLng latLng = new LatLng(0, 0);
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 0));
+                        }
                     }
 
                     if (parkListFragment != null) {
@@ -301,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private String getSelectedCountryCode() {
         SharedPreferences preferences = UtilsSharedPreferences.getSharedPreferencesFile(this, "GeneralConfig");
         GeneralConfig generalConfig = (GeneralConfig) UtilsSharedPreferences.getSharedPreferences(preferences, "GeneralConfig", GeneralConfig.class);
-        return generalConfig.getMainPageCountryCode();
+        return generalConfig.getMainPageCountryName();
     }
 
     public GoogleMap getMap(){
