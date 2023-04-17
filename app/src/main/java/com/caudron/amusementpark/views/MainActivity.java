@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.SearchView;
@@ -77,6 +78,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private PopupWindow autoCompletePopup;
     private List<String> parkNameList;
     private ListView autoCompleteListView;
+    private TextView numParksInZoneTextView;
 
 
     @Override
@@ -85,6 +87,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_main);
 
         findViewById(R.id.focus_dummy).requestFocus();
+
+        numParksInZoneTextView = findViewById(R.id.num_parks_textview);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -234,7 +238,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                     }
                 }
                 if (!markerClicked) {
-                    parkListFragment.updateParkList(mParkList);
+                    updateVisibleParksOnRecyclerView();
                 }
             }
         });
@@ -414,6 +418,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             if (parkListFragment != null) {
                 parkListFragment.updateParkList(visibleParks);
+                int numParks = visibleParks.size();
+                String formattedText = getResources().getString(R.string.num_parks_format, numParks);
+                numParksInZoneTextView.setText(formattedText);
             }
         }
     }

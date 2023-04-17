@@ -19,4 +19,5 @@
     <string name="logo_description">Logo de l\'application</string>
     <string name="no_park">Pas de parc d\'attraction dans cette zone…</string>
     <string name="rechercher_un_parc">Rechercher un parc</string>
+    <string name="num_parks_format">Nombre de parcs dans la zone : %1$d</string>
 </resources>

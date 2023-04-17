@@ -19,4 +19,5 @@
     <string name="logo_description">Anwendungslogo</string>
     <string name="no_park">Kein Freizeitpark in dieser Gegend…</string>
     <string name="rechercher_un_parc">Nach einem Freizeitpark suchen</string>
+    <string name="num_parks_format">"Anzahl der Parks in der Gegend: %1$d "</string>
 </resources>
