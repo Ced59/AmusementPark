@@ -1,10 +1,9 @@
-package com.caudron.amusementpark.views.starting_activities;
+package com.caudron.amusementpark.views.activities.starting_activities;
 
 import static com.caudron.amusementpark.keys.ApiKeys.API_CAPTAIN_COASTER_KEY;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -12,7 +11,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,12 +33,8 @@ import com.caudron.amusementpark.views.MainActivity;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -176,6 +170,7 @@ public class SplashScreenActivity extends AppCompatActivity {
 
 
     private void determineAndLaunchNextActivity() {
+        mBackgroundTaskInfoProgress.setText(R.string.data_preparation);
         new Handler().postDelayed(() -> {
             SharedPreferences preferences = UtilsSharedPreferences.getSharedPreferencesFile(this, "GeneralConfig");
             if (preferences.contains("GeneralConfig")) {
@@ -186,7 +181,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 startActivity(intent);
             }
             finish();
-        }, 1000);
+        }, 5000);
     }
 
     private void showErrorToast() {

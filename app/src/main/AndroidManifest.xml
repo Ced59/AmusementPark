@@ -22,7 +22,7 @@
             android:value="AIzaSyBI-Z-tn0WCVgFyyzshB8nk7BvbzUyJ-uA" />
 
         <activity
-            android:name=".views.starting_activities.SplashScreenActivity"
+            android:name=".views.activities.starting_activities.SplashScreenActivity"
             android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/GeneralTheme">
@@ -33,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.starting_activities.GeneralConfigActivity"
+            android:name=".views.activities.starting_activities.GeneralConfigActivity"
             android:exported="false"/>
         <activity
             android:name=".views.MainActivity"

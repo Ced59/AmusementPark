@@ -38,7 +38,7 @@ import com.caudron.amusementpark.viewmodels.database_view_model.DatabaseViewMode
 import com.caudron.amusementpark.views.adapters.FragmentAdapter;
 import com.caudron.amusementpark.views.fragments.ContentFragment;
 import com.caudron.amusementpark.views.fragments.ParkListFragment;
-import com.caudron.amusementpark.views.starting_activities.GeneralConfigActivity;
+import com.caudron.amusementpark.views.activities.starting_activities.GeneralConfigActivity;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;

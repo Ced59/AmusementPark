@@ -23,7 +23,8 @@
             android:layout_height="wrap_content"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:maxWidth="200dp" />
 
         <TextView
             android:id="@+id/text_view_park_location"
@@ -31,6 +32,20 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/text_view_park_name"
             android:layout_marginTop="4dp"
+            android:textColor="@color/white"
+            android:maxWidth="200dp" />
+
+        <Button
+            android:id="@+id/button_view_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginBottom="4dp"
+            android:layout_marginEnd="4dp"
+            android:padding="5dp"
+            android:background="@drawable/button_background"
+            android:text="@string/view_details"
             android:textColor="@color/white" />
 
     </RelativeLayout>

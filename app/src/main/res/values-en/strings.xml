@@ -20,4 +20,6 @@
     <string name="no_park">No amusement park in this area…</string>
     <string name="rechercher_un_parc">To search for an amusement park</string>
     <string name="num_parks_format">"Number of parks in the area: %1$d "</string>
+    <string name="view_details">View details</string>
+    <string name="data_preparation">Launching app in progress...</string>
 </resources>

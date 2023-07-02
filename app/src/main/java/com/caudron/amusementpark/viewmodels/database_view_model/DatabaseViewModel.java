@@ -221,4 +221,10 @@ public class DatabaseViewModel extends AndroidViewModel {
         ParkDao parkDao = db.parkDao();
         return parkDao.getAll();
     }
+
+    public LiveData<List<Coaster>> getCoastersByPark(Context context, int parkId){
+        AmusementParkDatabase db = AmusementParkDatabase.getInstance(context);
+        CoasterDao coasterDao = db.coasterDao();
+        return coasterDao.getByParkId(parkId);
+    }
 }

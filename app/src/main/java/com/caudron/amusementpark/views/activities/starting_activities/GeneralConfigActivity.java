@@ -1,4 +1,4 @@
-package com.caudron.amusementpark.views.starting_activities;
+package com.caudron.amusementpark.views.activities.starting_activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;

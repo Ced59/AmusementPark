@@ -34,7 +34,7 @@ public interface CoasterDao {
     Coaster getByName(String name);
 
     @Query("SELECT * FROM coasters WHERE parkId = :parkId")
-    List<Coaster> getByParkId(int parkId);
+    LiveData<List<Coaster>> getByParkId(int parkId);
 
     @Query("SELECT * FROM coasters WHERE materialTypeId = :materialTypeId")
     List<Coaster> getByMaterialTypeId(int materialTypeId);
